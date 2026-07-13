@@ -3,154 +3,200 @@
 
     <t t-name="otm_store_management.Dashboard" owl="1">
         <div class="otm_dashboard">
-            <div class="otm_page_head">
-                <div>
-                    <span class="otm_page_eyebrow">Store Management</span>
-                    <h2>Dashboard</h2>
-                </div>
-                <span class="otm_page_sub">Live view of stock across all stores</span>
-            </div>
+            <div class="otm_shell">
 
-            <div t-if="state.loading" class="text-muted">Loading dashboard...</div>
+                <div class="otm_side_backdrop" t-if="state.navOpen" t-on-click="closeNav"/>
 
-            <div t-else="">
-                <div class="otm_lowstock_panel" t-if="state.lowStockItems.length">
-                    <div class="otm_lowstock_head">
+                <aside t-attf-class="otm_sidebar {{state.navOpen ? 'otm_sidebar_open' : ''}}">
+                    <div class="otm_side_brand">
+                        <div class="otm_side_mark">O</div>
                         <div>
-                            <h3>Low Stock — Action Required</h3>
-                            <div class="otm_lowstock_sub">Products at or below their reorder level, ranked by urgency</div>
-                        </div>
-                        <span class="otm_count_pill"><t t-esc="state.lowStockItems.length"/> ITEMS</span>
-                    </div>
-                    <div class="otm_lowstock_rows">
-                        <div t-foreach="state.lowStockItems" t-as="item" t-key="item.product + item.store" class="otm_stock_row">
-                            <div class="otm_item_id">
-                                <span class="otm_pname"><t t-esc="item.product"/></span>
-                                <span class="otm_meta">
-                                    <span class="otm_store_tag"><t t-esc="item.store"/></span>
-                                    <span t-attf-class="otm_status_tag {{item.status}}" t-if="item.status === 'out'">OUT OF STOCK</span>
-                                    <span t-attf-class="otm_status_tag {{item.status}}" t-elif="item.status === 'critical'">CRITICAL</span>
-                                    <t t-else="">reorder at <t t-esc="item.reorder_qty"/> <t t-esc="item.uom"/></t>
-                                </span>
-                            </div>
-                            <div class="otm_gauge_wrap">
-                                <div class="otm_gauge_track">
-                                    <div t-attf-class="otm_gauge_fill {{gaugeIsCritical(item) ? 'critical' : ''}}"
-                                         t-attf-style="width: {{gaugeFillWidth(item)}}"/>
-                                    <div class="otm_gauge_marker" t-attf-style="left: {{gaugeReorderPosition(item)}}"/>
-                                </div>
-                                <div class="otm_gauge_nums">
-                                    <span class="now"><t t-esc="item.current_qty"/> <t t-esc="item.uom"/> on hand</span>
-                                    <span t-if="item.avg_daily_consumption">~<t t-esc="item.avg_daily_consumption"/>/day last month</span>
-                                </div>
-                            </div>
-                            <div t-if="isStockOut(item)" class="otm_cover_tag out">
-                                <span class="n">0</span>
-                                <span class="u">out of stock</span>
-                            </div>
-                            <div t-else="" t-attf-class="otm_cover_tag {{gaugeIsCritical(item) ? 'crit' : 'warn'}}">
-                                <span class="n"><t t-esc="coverLabel(item)"/></span>
-                                <span class="u">days cover</span>
-                            </div>
-                            <div class="otm_row_action">
-                                <button type="button" t-on-click="() => this.onOpenLowStock()">+ Purchase</button>
-                            </div>
+                            <div class="otm_side_name">Otomater</div>
+                            <div class="otm_side_sub">Store Management</div>
                         </div>
                     </div>
-                    <div class="otm_lowstock_foot">
-                        Sorted by days of cover, based on last month's issue movements
-                    </div>
-                </div>
-                <div class="otm_lowstock_panel otm_lowstock_empty" t-else="">
-                    <div class="otm_lowstock_head">
+
+                    <div class="otm_side_group_label">Overview</div>
+                    <ul class="otm_side_nav">
+                        <li><a class="active" href="#">Dashboard</a></li>
+                    </ul>
+
+                    <div class="otm_side_group_label">Operations</div>
+                    <ul class="otm_side_nav">
+                        <li><a href="#" t-on-click.prevent="() => this.navigate('action_otm_purchase')">Purchases</a></li>
+                        <li><a href="#" t-on-click.prevent="() => this.navigate('action_otm_stock_receipt')">Stock Receipts</a></li>
+                        <li><a href="#" t-on-click.prevent="() => this.navigate('action_otm_stock_transfer')">Internal Transfers</a></li>
+                        <li><a href="#" t-on-click.prevent="() => this.navigate('action_otm_stock_issue')">Stock Issues</a></li>
+                        <li><a href="#" t-on-click.prevent="() => this.navigate('action_otm_stock_return')">Stock Returns</a></li>
+                        <li><a href="#" t-on-click.prevent="() => this.navigate('action_otm_stock_adjustment')">Adjustments</a></li>
+                    </ul>
+
+                    <div class="otm_side_group_label">Stock</div>
+                    <ul class="otm_side_nav">
+                        <li><a href="#" t-on-click.prevent="() => this.navigate('action_otm_stock_quant')">Live Stock</a></li>
+                        <li><a href="#" t-on-click.prevent="() => this.navigate('action_otm_stock_move')">Stock Ledger</a></li>
+                        <li><a href="#" t-on-click.prevent="() => this.navigate('action_otm_product_batch')">Batches / Expiry</a></li>
+                    </ul>
+
+                    <div class="otm_side_group_label">Master Data</div>
+                    <ul class="otm_side_nav">
+                        <li><a href="#" t-on-click.prevent="() => this.navigate('action_otm_store')">Stores</a></li>
+                        <li><a href="#" t-on-click.prevent="() => this.navigate('action_otm_store_location')">Storage Locations</a></li>
+                    </ul>
+                </aside>
+
+                <div class="otm_main">
+                    <div class="otm_page_head">
+                        <button type="button" class="otm_nav_toggle" aria-label="Toggle menu" t-on-click="toggleNav"><span/></button>
                         <div>
-                            <h3>Low Stock — Action Required</h3>
-                            <div class="otm_lowstock_sub">Nothing below its reorder level right now.</div>
+                            <span class="otm_page_eyebrow">Store Management</span>
+                            <h2>Dashboard</h2>
                         </div>
+                        <span class="otm_page_sub">Live view of stock across all stores</span>
                     </div>
-                </div>
 
-                <div class="otm_kpi_row">
-                    <div class="otm_kpi_card" t-on-click="onOpenStores">
-                        <div class="otm_kpi_value"><t t-esc="state.cards.total_stores"/></div>
-                        <div class="otm_kpi_label">Total Stores</div>
-                    </div>
-                    <div class="otm_kpi_card">
-                        <div class="otm_kpi_value"><t t-esc="state.cards.total_products"/></div>
-                        <div class="otm_kpi_label">Total Products</div>
-                    </div>
-                    <div class="otm_kpi_card">
-                        <div class="otm_kpi_value"><t t-esc="state.cards.inventory_value"/></div>
-                        <div class="otm_kpi_label">Inventory Value</div>
-                    </div>
-                    <div class="otm_kpi_card">
-                        <div class="otm_kpi_value"><t t-esc="state.cards.today_purchase"/></div>
-                        <div class="otm_kpi_label">Today's Purchase</div>
-                    </div>
-                    <div class="otm_kpi_card">
-                        <div class="otm_kpi_value"><t t-esc="state.cards.today_transfer"/></div>
-                        <div class="otm_kpi_label">Today's Transfer</div>
-                    </div>
-                    <div class="otm_kpi_card">
-                        <div class="otm_kpi_value"><t t-esc="state.cards.today_issue"/></div>
-                        <div class="otm_kpi_label">Today's Issue</div>
-                    </div>
-                    <div class="otm_kpi_card otm_kpi_warning" t-on-click="onOpenLowStock">
-                        <div class="otm_kpi_value"><t t-esc="state.cards.low_stock"/></div>
-                        <div class="otm_kpi_label">Low Stock</div>
-                    </div>
-                    <div class="otm_kpi_card otm_kpi_danger" t-on-click="onOpenLowStock">
-                        <div class="otm_kpi_value"><t t-esc="state.cards.stock_out"/></div>
-                        <div class="otm_kpi_label">Stock Out</div>
-                    </div>
-                    <div class="otm_kpi_card otm_kpi_danger" t-on-click="onOpenExpiry">
-                        <div class="otm_kpi_value"><t t-esc="state.cards.expired"/></div>
-                        <div class="otm_kpi_label">Expired</div>
-                    </div>
-                    <div class="otm_kpi_card otm_kpi_warning" t-on-click="onOpenExpiry">
-                        <div class="otm_kpi_value"><t t-esc="state.cards.near_expiry"/></div>
-                        <div class="otm_kpi_label">Near Expiry</div>
-                    </div>
-                    <div class="otm_kpi_card" t-on-click="onOpenLedger">
-                        <div class="otm_kpi_value"><t t-esc="state.cards.pending_approvals"/></div>
-                        <div class="otm_kpi_label">Pending Approvals</div>
-                    </div>
-                </div>
+                    <div t-if="state.loading" class="text-muted">Loading dashboard...</div>
 
-                <div class="otm_chart_row">
-                    <div class="otm_chart_card">
-                        <h4>Department Wise Consumption (this month)</h4>
-                        <div t-if="!state.departmentConsumption.length" class="text-muted">No data yet.</div>
-                        <div t-foreach="state.departmentConsumption" t-as="item" t-key="item.label" class="otm_bar_row">
-                            <span class="otm_bar_label"><t t-esc="item.label"/></span>
-                            <div class="otm_bar_track">
-                                <div class="otm_bar_fill" t-attf-style="width: {{barWidth(item.value, state.departmentConsumption)}}"/>
+                    <div t-else="">
+                        <div class="otm_lowstock_panel" t-if="state.lowStockItems.length">
+                            <div class="otm_lowstock_head">
+                                <div>
+                                    <h3>Low Stock — Action Required</h3>
+                                    <div class="otm_lowstock_sub">Products at or below their reorder level, ranked by urgency</div>
+                                </div>
+                                <span class="otm_count_pill"><t t-esc="state.lowStockItems.length"/> ITEMS</span>
                             </div>
-                            <span class="otm_bar_value"><t t-esc="item.value"/></span>
-                        </div>
-                    </div>
-
-                    <div class="otm_chart_card">
-                        <h4>Store Wise Stock Value</h4>
-                        <div t-if="!state.storeWiseStock.length" class="text-muted">No data yet.</div>
-                        <div t-foreach="state.storeWiseStock" t-as="item" t-key="item.label" class="otm_bar_row">
-                            <span class="otm_bar_label"><t t-esc="item.label"/></span>
-                            <div class="otm_bar_track">
-                                <div class="otm_bar_fill otm_bar_fill_alt" t-attf-style="width: {{barWidth(item.value, state.storeWiseStock)}}"/>
+                            <div class="otm_lowstock_rows">
+                                <div t-foreach="state.lowStockItems" t-as="item" t-key="item.product + item.store" class="otm_stock_row">
+                                    <div class="otm_item_id">
+                                        <span class="otm_pname"><t t-esc="item.product"/></span>
+                                        <span class="otm_meta">
+                                            <span class="otm_store_tag"><t t-esc="item.store"/></span>
+                                            <span t-attf-class="otm_status_tag {{item.status}}" t-if="item.status === 'out'">OUT OF STOCK</span>
+                                            <span t-attf-class="otm_status_tag {{item.status}}" t-elif="item.status === 'critical'">CRITICAL</span>
+                                            <t t-else="">reorder at <t t-esc="item.reorder_qty"/> <t t-esc="item.uom"/></t>
+                                        </span>
+                                    </div>
+                                    <div class="otm_gauge_wrap">
+                                        <div class="otm_gauge_track">
+                                            <div t-attf-class="otm_gauge_fill {{gaugeIsCritical(item) ? 'critical' : ''}}"
+                                                 t-attf-style="width: {{gaugeFillWidth(item)}}"/>
+                                            <div class="otm_gauge_marker" t-attf-style="left: {{gaugeReorderPosition(item)}}"/>
+                                        </div>
+                                        <div class="otm_gauge_nums">
+                                            <span class="now"><t t-esc="item.current_qty"/> <t t-esc="item.uom"/> on hand</span>
+                                            <span t-if="item.avg_daily_consumption">~<t t-esc="item.avg_daily_consumption"/>/day last month</span>
+                                        </div>
+                                    </div>
+                                    <div t-if="isStockOut(item)" class="otm_cover_tag out">
+                                        <span class="n">0</span>
+                                        <span class="u">out of stock</span>
+                                    </div>
+                                    <div t-else="" t-attf-class="otm_cover_tag {{gaugeIsCritical(item) ? 'crit' : 'warn'}}">
+                                        <span class="n"><t t-esc="coverLabel(item)"/></span>
+                                        <span class="u">days cover</span>
+                                    </div>
+                                    <div class="otm_row_action">
+                                        <button type="button" t-on-click="() => this.onOpenLowStock()">+ Purchase</button>
+                                    </div>
+                                </div>
                             </div>
-                            <span class="otm_bar_value"><t t-esc="item.value"/></span>
+                            <div class="otm_lowstock_foot">
+                                Sorted by days of cover, based on last month's issue movements
+                            </div>
                         </div>
-                    </div>
-                </div>
+                        <div class="otm_lowstock_panel otm_lowstock_empty" t-else="">
+                            <div class="otm_lowstock_head">
+                                <div>
+                                    <h3>Low Stock — Action Required</h3>
+                                    <div class="otm_lowstock_sub">Nothing below its reorder level right now.</div>
+                                </div>
+                            </div>
+                        </div>
 
-                <div class="otm_chart_row">
-                    <div class="otm_chart_card">
-                        <h4>Monthly Purchase Value</h4>
-                        <div class="otm_kpi_value"><t t-esc="state.monthlyPurchaseValue"/></div>
-                    </div>
-                    <div class="otm_chart_card">
-                        <h4>Monthly Consumption Value</h4>
-                        <div class="otm_kpi_value"><t t-esc="state.monthlyConsumptionValue"/></div>
+                        <div class="otm_kpi_row">
+                            <div class="otm_kpi_card" t-on-click="onOpenStores">
+                                <div class="otm_kpi_value"><t t-esc="state.cards.total_stores"/></div>
+                                <div class="otm_kpi_label">Total Stores</div>
+                            </div>
+                            <div class="otm_kpi_card">
+                                <div class="otm_kpi_value"><t t-esc="state.cards.total_products"/></div>
+                                <div class="otm_kpi_label">Total Products</div>
+                            </div>
+                            <div class="otm_kpi_card">
+                                <div class="otm_kpi_value"><t t-esc="state.cards.inventory_value"/></div>
+                                <div class="otm_kpi_label">Inventory Value</div>
+                            </div>
+                            <div class="otm_kpi_card">
+                                <div class="otm_kpi_value"><t t-esc="state.cards.today_purchase"/></div>
+                                <div class="otm_kpi_label">Today's Purchase</div>
+                            </div>
+                            <div class="otm_kpi_card">
+                                <div class="otm_kpi_value"><t t-esc="state.cards.today_transfer"/></div>
+                                <div class="otm_kpi_label">Today's Transfer</div>
+                            </div>
+                            <div class="otm_kpi_card">
+                                <div class="otm_kpi_value"><t t-esc="state.cards.today_issue"/></div>
+                                <div class="otm_kpi_label">Today's Issue</div>
+                            </div>
+                            <div class="otm_kpi_card otm_kpi_warning" t-on-click="onOpenLowStock">
+                                <div class="otm_kpi_value"><t t-esc="state.cards.low_stock"/></div>
+                                <div class="otm_kpi_label">Low Stock</div>
+                            </div>
+                            <div class="otm_kpi_card otm_kpi_danger" t-on-click="onOpenLowStock">
+                                <div class="otm_kpi_value"><t t-esc="state.cards.stock_out"/></div>
+                                <div class="otm_kpi_label">Stock Out</div>
+                            </div>
+                            <div class="otm_kpi_card otm_kpi_danger" t-on-click="onOpenExpiry">
+                                <div class="otm_kpi_value"><t t-esc="state.cards.expired"/></div>
+                                <div class="otm_kpi_label">Expired</div>
+                            </div>
+                            <div class="otm_kpi_card otm_kpi_warning" t-on-click="onOpenExpiry">
+                                <div class="otm_kpi_value"><t t-esc="state.cards.near_expiry"/></div>
+                                <div class="otm_kpi_label">Near Expiry</div>
+                            </div>
+                            <div class="otm_kpi_card" t-on-click="onOpenLedger">
+                                <div class="otm_kpi_value"><t t-esc="state.cards.pending_approvals"/></div>
+                                <div class="otm_kpi_label">Pending Approvals</div>
+                            </div>
+                        </div>
+
+                        <div class="otm_chart_row">
+                            <div class="otm_chart_card">
+                                <h4>Department Wise Consumption (this month)</h4>
+                                <div t-if="!state.departmentConsumption.length" class="text-muted">No data yet.</div>
+                                <div t-foreach="state.departmentConsumption" t-as="item" t-key="item.label" class="otm_bar_row">
+                                    <span class="otm_bar_label"><t t-esc="item.label"/></span>
+                                    <div class="otm_bar_track">
+                                        <div class="otm_bar_fill" t-attf-style="width: {{barWidth(item.value, state.departmentConsumption)}}"/>
+                                    </div>
+                                    <span class="otm_bar_value"><t t-esc="item.value"/></span>
+                                </div>
+                            </div>
+
+                            <div class="otm_chart_card">
+                                <h4>Store Wise Stock Value</h4>
+                                <div t-if="!state.storeWiseStock.length" class="text-muted">No data yet.</div>
+                                <div t-foreach="state.storeWiseStock" t-as="item" t-key="item.label" class="otm_bar_row">
+                                    <span class="otm_bar_label"><t t-esc="item.label"/></span>
+                                    <div class="otm_bar_track">
+                                        <div class="otm_bar_fill otm_bar_fill_alt" t-attf-style="width: {{barWidth(item.value, state.storeWiseStock)}}"/>
+                                    </div>
+                                    <span class="otm_bar_value"><t t-esc="item.value"/></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="otm_chart_row">
+                            <div class="otm_chart_card">
+                                <h4>Monthly Purchase Value</h4>
+                                <div class="otm_kpi_value"><t t-esc="state.monthlyPurchaseValue"/></div>
+                            </div>
+                            <div class="otm_chart_card">
+                                <h4>Monthly Consumption Value</h4>
+                                <div class="otm_kpi_value"><t t-esc="state.monthlyConsumptionValue"/></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

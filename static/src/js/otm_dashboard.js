@@ -3,7 +3,7 @@
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { user } from "@web/core/user";
-import { Component, onWillStart, useState } from "@odoo/owl";
+import { Component, onWillStart, onMounted, onWillUnmount, useState } from "@odoo/owl";
 
 class OtmStoreDashboard extends Component {
     static template = "otm_store_management.Dashboard";
@@ -15,6 +15,7 @@ class OtmStoreDashboard extends Component {
         this.userName = user.name;
         this.state = useState({
             loading: true,
+            navOpen: false,
             cards: {},
             lowStockItems: [],
             departmentConsumption: [],
@@ -22,6 +23,14 @@ class OtmStoreDashboard extends Component {
             monthlyPurchaseValue: 0,
             monthlyConsumptionValue: 0,
         });
+
+        this._onKeydown = (ev) => {
+            if (ev.key === "Escape") {
+                this.closeNav();
+            }
+        };
+        onMounted(() => document.addEventListener("keydown", this._onKeydown));
+        onWillUnmount(() => document.removeEventListener("keydown", this._onKeydown));
 
         onWillStart(async () => {
             await this.loadData();
@@ -99,6 +108,20 @@ class OtmStoreDashboard extends Component {
 
     onOpenLedger() {
         this.action.doAction("otm_store_management.action_otm_stock_move");
+    }
+
+    // --- sidebar ---
+    navigate(actionXmlId) {
+        this.state.navOpen = false;
+        this.action.doAction("otm_store_management." + actionXmlId);
+    }
+
+    toggleNav() {
+        this.state.navOpen = !this.state.navOpen;
+    }
+
+    closeNav() {
+        this.state.navOpen = false;
     }
 }
 

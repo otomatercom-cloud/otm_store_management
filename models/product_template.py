@@ -26,7 +26,7 @@ class ProductTemplate(models.Model):
         ('secure', 'Secure / Controlled'),
     ], string='Storage Type', default='normal')
 
-    otm_quant_ids = fields.One2many('otm.stock.quant', 'product_id', string='Live Stock')
+    otm_quant_ids = fields.One2many('otm.stock.quant', 'product_tmpl_id', string='Live Stock')
     otm_current_qty = fields.Float(compute='_compute_otm_stock', string='Current Stock')
     otm_is_low_stock = fields.Boolean(compute='_compute_otm_stock', string='Low Stock', search='_search_low_stock')
 

@@ -2,9 +2,13 @@
 <templates xml:space="preserve">
 
     <t t-name="otm_store_management.Dashboard" owl="1">
-        <div class="otm_dashboard p-3">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2>Store Management Dashboard</h2>
+        <div class="otm_dashboard">
+            <div class="otm_page_head">
+                <div>
+                    <span class="otm_page_eyebrow">Store Management</span>
+                    <h2>Dashboard</h2>
+                </div>
+                <span class="otm_page_sub">Live view of stock across all stores</span>
             </div>
 
             <div t-if="state.loading" class="text-muted">Loading dashboard...</div>

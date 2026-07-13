@@ -48,7 +48,6 @@
             <field name="name">Rice (25kg Bag)</field>
             <field name="type">consu</field>
             <field name="uom_id" ref="uom.product_uom_kgm"/>
-            <field name="uom_po_id" ref="uom.product_uom_kgm"/>
             <field name="otm_gst_percent">5.0</field>
             <field name="otm_hsn_code">1006</field>
             <field name="otm_min_qty">50</field>
@@ -62,7 +61,6 @@
             <field name="name">Sugar</field>
             <field name="type">consu</field>
             <field name="uom_id" ref="uom.product_uom_kgm"/>
-            <field name="uom_po_id" ref="uom.product_uom_kgm"/>
             <field name="otm_gst_percent">5.0</field>
             <field name="otm_hsn_code">1701</field>
             <field name="otm_min_qty">100</field>
@@ -76,7 +74,6 @@
             <field name="name">Milk (1L Packet)</field>
             <field name="type">consu</field>
             <field name="uom_id" ref="uom.product_uom_litre"/>
-            <field name="uom_po_id" ref="uom.product_uom_litre"/>
             <field name="otm_gst_percent">0.0</field>
             <field name="otm_hsn_code">0401</field>
             <field name="otm_min_qty">20</field>

@@ -135,7 +135,7 @@ class OtmPurchaseLine(models.Model):
     def _onchange_product(self):
         if self.product_tmpl_id:
             self.gst_percent = self.product_tmpl_id.otm_gst_percent
-            self.uom_id = self.product_tmpl_id.otm_purchase_uom_id or self.product_tmpl_id.uom_po_id
+            self.uom_id = self.product_tmpl_id.otm_purchase_uom_id or self.product_tmpl_id.uom_id
 
     @api.depends('quantity', 'unit_price', 'gst_percent', 'purchase_id.is_interstate')
     def _compute_tax(self):

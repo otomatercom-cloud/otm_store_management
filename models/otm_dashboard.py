@@ -19,10 +19,33 @@ class OtmDashboard(models.AbstractModel):
         month_start = today.replace(day=1)
 
         quants = Quant.search([])
-        low_stock_products = [
-            q for q in quants
-            if q.product_tmpl_id.otm_reorder_qty and q.quantity <= q.product_tmpl_id.otm_reorder_qty
-        ]
+
+        # Aggregate to (store, product) first — a product can have several
+        # quant rows in the same store (different locations/batches), and
+        # the reorder threshold is a store-level total, not a per-row one.
+        store_product_qty = {}
+        for q in quants:
+            key = (q.store_id, q.product_tmpl_id)
+            store_product_qty[key] = store_product_qty.get(key, 0.0) + q.quantity
+
+        low_stock_rows = []
+        for (store, product), qty in store_product_qty.items():
+            if product.otm_reorder_qty and qty <= product.otm_reorder_qty:
+                avg_daily = product.otm_avg_daily_consumption
+                days_cover = round(qty / avg_daily, 1) if avg_daily > 0 else None
+                low_stock_rows.append({
+                    'product': product.name,
+                    'store': store.name,
+                    'current_qty': round(qty, 2),
+                    'reorder_qty': product.otm_reorder_qty,
+                    'max_qty': product.otm_max_qty,
+                    'uom': product.uom_id.name,
+                    'last_month_consumption': round(product.otm_last_month_consumption, 2),
+                    'avg_daily_consumption': round(avg_daily, 2),
+                    'days_of_cover': days_cover,
+                })
+        # most urgent (fewest days of cover) first; unknown rate goes last
+        low_stock_rows.sort(key=lambda r: (r['days_of_cover'] is None, r['days_of_cover'] or 0))
 
         batches = Batch.search([])
         expired = batches.filtered(lambda b: b.expiry_state == 'expired')
@@ -64,11 +87,12 @@ class OtmDashboard(models.AbstractModel):
                 'today_purchase': purchase_today,
                 'today_transfer': transfer_today,
                 'today_issue': issue_today,
-                'low_stock': len(low_stock_products),
+                'low_stock': len(low_stock_rows),
                 'expired': len(expired),
                 'near_expiry': len(near_expiry),
                 'pending_approvals': pending_approvals,
             },
+            'low_stock_items': low_stock_rows,
             'department_consumption': [
                 {'label': k, 'value': round(v, 2)} for k, v in
                 sorted(dept_consumption.items(), key=lambda x: -x[1])

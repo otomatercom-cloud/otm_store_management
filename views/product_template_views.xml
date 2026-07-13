@@ -36,6 +36,16 @@
                         <field name="otm_current_qty" readonly="1"/>
                         <field name="otm_is_low_stock" readonly="1"/>
                     </group>
+                    <group string="Consumption &amp; Reorder Forecast">
+                        <group>
+                            <field name="otm_last_month_consumption" readonly="1"/>
+                            <field name="otm_avg_daily_consumption" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="otm_projected_month_consumption" readonly="1"/>
+                            <field name="otm_days_of_cover" readonly="1"/>
+                        </group>
+                    </group>
                 </page>
             </notebook>
         </field>

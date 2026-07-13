@@ -16,6 +16,7 @@ class OtmStoreDashboard extends Component {
         this.state = useState({
             loading: true,
             cards: {},
+            lowStockItems: [],
             departmentConsumption: [],
             storeWiseStock: [],
             monthlyPurchaseValue: 0,
@@ -31,6 +32,7 @@ class OtmStoreDashboard extends Component {
         this.state.loading = true;
         const data = await this.orm.call("otm.dashboard", "get_dashboard_data", [[]]);
         this.state.cards = data.cards;
+        this.state.lowStockItems = data.low_stock_items;
         this.state.departmentConsumption = data.department_consumption;
         this.state.storeWiseStock = data.store_wise_stock;
         this.state.monthlyPurchaseValue = data.monthly_purchase_value;
@@ -48,6 +50,35 @@ class OtmStoreDashboard extends Component {
     barWidth(value, list) {
         const max = this.maxValue(list);
         return Math.round((value / max) * 100) + "%";
+    }
+
+    // --- low stock gauge helpers ---
+    gaugeCap(item) {
+        // fall back to a sensible ceiling when max_qty isn't configured,
+        // so the bar never divides by zero or looks empty.
+        return item.max_qty > 0 ? item.max_qty : Math.max(item.reorder_qty * 2, item.current_qty, 1);
+    }
+
+    gaugeFillWidth(item) {
+        const cap = this.gaugeCap(item);
+        const pct = Math.min((item.current_qty / cap) * 100, 100);
+        return Math.max(pct, 0) + "%";
+    }
+
+    gaugeReorderPosition(item) {
+        const cap = this.gaugeCap(item);
+        return Math.min((item.reorder_qty / cap) * 100, 100) + "%";
+    }
+
+    gaugeIsCritical(item) {
+        return item.days_of_cover !== null && item.days_of_cover !== false && item.days_of_cover <= 3;
+    }
+
+    coverLabel(item) {
+        if (item.days_of_cover === null || item.days_of_cover === false) {
+            return "—";
+        }
+        return item.days_of_cover < 1 ? "<1" : Math.round(item.days_of_cover);
     }
 
     onOpenStores() {

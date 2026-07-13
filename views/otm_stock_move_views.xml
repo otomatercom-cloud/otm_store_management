@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_otm_stock_move_list" model="ir.ui.view">
+        <field name="name">otm.stock.move.list</field>
+        <field name="model">otm.stock.move</field>
+        <field name="arch" type="xml">
+            <list string="Stock Ledger" create="false" edit="false"
+                  decoration-danger="quantity &lt; 0" decoration-success="quantity &gt; 0">
+                <field name="date"/>
+                <field name="reference"/>
+                <field name="move_type"/>
+                <field name="product_tmpl_id"/>
+                <field name="batch_id" optional="show"/>
+                <field name="store_id"/>
+                <field name="location_id" optional="hide"/>
+                <field name="quantity"/>
+                <field name="unit_cost" optional="show"/>
+                <field name="total_cost" widget="monetary"/>
+                <field name="department" optional="show"/>
+                <field name="user_id" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_otm_stock_move_pivot" model="ir.ui.view">
+        <field name="name">otm.stock.move.pivot</field>
+        <field name="model">otm.stock.move</field>
+        <field name="arch" type="xml">
+            <pivot string="Stock Movement Analysis">
+                <field name="move_type" type="row"/>
+                <field name="store_id" type="col"/>
+                <field name="quantity" type="measure"/>
+                <field name="total_cost" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_otm_stock_move_graph" model="ir.ui.view">
+        <field name="name">otm.stock.move.graph</field>
+        <field name="model">otm.stock.move</field>
+        <field name="arch" type="xml">
+            <graph string="Stock Movement Trend" type="line">
+                <field name="date" interval="day"/>
+                <field name="total_cost" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_otm_stock_move_search" model="ir.ui.view">
+        <field name="name">otm.stock.move.search</field>
+        <field name="model">otm.stock.move</field>
+        <field name="arch" type="xml">
+            <search string="Stock Ledger">
+                <field name="reference"/>
+                <field name="product_tmpl_id"/>
+                <field name="store_id"/>
+                <field name="batch_id"/>
+                <filter string="Purchases" name="purchases" domain="[('move_type', '=', 'purchase')]"/>
+                <filter string="Transfers" name="transfers" domain="[('move_type', 'in', ('transfer_in', 'transfer_out'))]"/>
+                <filter string="Issues" name="issues" domain="[('move_type', '=', 'issue')]"/>
+                <filter string="Returns" name="returns" domain="[('move_type', '=', 'return_in')]"/>
+                <filter string="Adjustments" name="adjustments" domain="[('move_type', 'in', ('adjustment_in', 'adjustment_out'))]"/>
+                <group>
+                    <filter string="Product" name="group_product" context="{'group_by': 'product_tmpl_id'}"/>
+                    <filter string="Store" name="group_store" context="{'group_by': 'store_id'}"/>
+                    <filter string="Movement Type" name="group_type" context="{'group_by': 'move_type'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_otm_stock_move" model="ir.actions.act_window">
+        <field name="name">Stock Ledger</field>
+        <field name="res_model">otm.stock.move</field>
+        <field name="view_mode">list,pivot,graph</field>
+        <field name="search_view_id" ref="view_otm_stock_move_search"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_product_template_form_otm_inherit" model="ir.ui.view">
+        <field name="name">product.template.form.otm.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Store Management" name="otm_store_management">
+                    <group>
+                        <group string="Tax &amp; Classification">
+                            <field name="otm_gst_percent"/>
+                            <field name="otm_hsn_code"/>
+                            <field name="otm_storage_type"/>
+                        </group>
+                        <group string="Units">
+                            <field name="otm_purchase_uom_id"/>
+                            <field name="otm_issue_uom_id"/>
+                            <field name="otm_preferred_vendor_id"/>
+                        </group>
+                        <group string="Reorder Levels">
+                            <field name="otm_min_qty"/>
+                            <field name="otm_max_qty"/>
+                            <field name="otm_reorder_qty"/>
+                            <field name="otm_critical_qty"/>
+                        </group>
+                        <group string="Expiry / Batch">
+                            <field name="otm_is_perishable"/>
+                            <field name="otm_is_batch_tracked"/>
+                            <field name="otm_shelf_life_days"/>
+                            <field name="otm_expiry_alert_days"/>
+                        </group>
+                    </group>
+                    <group string="Live Stock">
+                        <field name="otm_current_qty" readonly="1"/>
+                        <field name="otm_is_low_stock" readonly="1"/>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+    <!-- NOTE: the product list/tree view inheritance was intentionally left
+         out here. The base view's external id may have moved as part of
+         the tree->list rename in Odoo 19 (product_template_tree_view vs a
+         possible product_template_list_view); confirm the correct id on
+         the target instance before adding a xpath-based extension to it. -->
+
+</odoo>

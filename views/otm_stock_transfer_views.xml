@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_otm_stock_transfer_list" model="ir.ui.view">
+        <field name="name">otm.stock.transfer.list</field>
+        <field name="model">otm.stock.transfer</field>
+        <field name="arch" type="xml">
+            <list string="Internal Transfers" decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="from_store_id"/>
+                <field name="to_store_id"/>
+                <field name="transfer_date"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'received'"
+                       decoration-info="state in ('approved', 'issued')"
+                       decoration-warning="state == 'requested'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_otm_stock_transfer_form" model="ir.ui.view">
+        <field name="name">otm.stock.transfer.form</field>
+        <field name="model">otm.stock.transfer</field>
+        <field name="arch" type="xml">
+            <form string="Internal Stock Transfer">
+                <header>
+                    <button name="action_request" type="object" string="Request" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                            invisible="state != 'requested'"
+                            groups="otm_store_management.group_otm_store_manager"/>
+                    <button name="action_issue" type="object" string="Issue" class="btn-primary"
+                            invisible="state != 'approved'"/>
+                    <button name="action_receive" type="object" string="Confirm Receipt" class="btn-primary"
+                            invisible="state != 'issued'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('cancelled', 'received')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,requested,approved,issued,received"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="from_store_id"/>
+                            <field name="from_location_id"/>
+                            <field name="requested_by" readonly="1"/>
+                            <field name="approved_by" readonly="1" invisible="not approved_by"/>
+                        </group>
+                        <group>
+                            <field name="to_store_id"/>
+                            <field name="to_location_id"/>
+                            <field name="issued_by" readonly="1" invisible="not issued_by"/>
+                            <field name="received_by" readonly="1" invisible="not received_by"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="transfer_date"/>
+                            <field name="expected_date"/>
+                            <field name="completed_date" invisible="not completed_date"/>
+                        </group>
+                        <group>
+                            <field name="reason"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Lines">
+                            <field name="line_ids" readonly="state in ('issued', 'received', 'cancelled')">
+                                <list editable="bottom">
+                                    <field name="product_tmpl_id"/>
+                                    <field name="batch_id"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="unit_cost"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Remarks">
+                            <field name="remarks" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_otm_stock_transfer_search" model="ir.ui.view">
+        <field name="name">otm.stock.transfer.search</field>
+        <field name="model">otm.stock.transfer</field>
+        <field name="arch" type="xml">
+            <search string="Internal Transfers">
+                <field name="name"/>
+                <field name="from_store_id"/>
+                <field name="to_store_id"/>
+                <filter string="Pending Approval" name="pending" domain="[('state', '=', 'requested')]"/>
+                <group>
+                    <filter string="From Store" name="group_from" context="{'group_by': 'from_store_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_otm_stock_transfer" model="ir.actions.act_window">
+        <field name="name">Internal Transfers</field>
+        <field name="res_model">otm.stock.transfer</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_otm_stock_transfer_search"/>
+    </record>
+
+</odoo>

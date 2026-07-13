@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_otm_store_location_list" model="ir.ui.view">
+        <field name="name">otm.store.location.list</field>
+        <field name="model">otm.store.location</field>
+        <field name="arch" type="xml">
+            <list string="Storage Locations">
+                <field name="complete_name"/>
+                <field name="store_id"/>
+                <field name="location_type"/>
+                <field name="barcode"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_otm_store_location_form" model="ir.ui.view">
+        <field name="name">otm.store.location.form</field>
+        <field name="model">otm.store.location</field>
+        <field name="arch" type="xml">
+            <form string="Storage Location">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="store_id"/>
+                            <field name="parent_id"/>
+                        </group>
+                        <group>
+                            <field name="location_type"/>
+                            <field name="barcode"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_otm_store_location_search" model="ir.ui.view">
+        <field name="name">otm.store.location.search</field>
+        <field name="model">otm.store.location</field>
+        <field name="arch" type="xml">
+            <search string="Storage Locations">
+                <field name="name"/>
+                <field name="store_id"/>
+                <group>
+                    <filter string="Store" name="group_store" context="{'group_by': 'store_id'}"/>
+                    <filter string="Type" name="group_type" context="{'group_by': 'location_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_otm_store_location" model="ir.actions.act_window">
+        <field name="name">Storage Locations</field>
+        <field name="res_model">otm.store.location</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_otm_store_location_search"/>
+    </record>
+
+</odoo>

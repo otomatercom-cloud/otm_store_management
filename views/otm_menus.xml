@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_otm_store_root" name="Store Management" sequence="20"
+              web_icon="otm_store_management,static/description/icon.png"/>
+
+    <menuitem id="menu_otm_dashboard" name="Dashboard" parent="menu_otm_store_root"
+              action="action_otm_dashboard" sequence="1"/>
+
+    <menuitem id="menu_otm_operations" name="Operations" parent="menu_otm_store_root" sequence="10"/>
+    <menuitem id="menu_otm_purchase" name="Purchases" parent="menu_otm_operations"
+              action="action_otm_purchase" sequence="1"/>
+    <menuitem id="menu_otm_stock_receipt" name="Stock Receipts (GRN)" parent="menu_otm_operations"
+              action="action_otm_stock_receipt" sequence="2"/>
+    <menuitem id="menu_otm_stock_transfer" name="Internal Transfers" parent="menu_otm_operations"
+              action="action_otm_stock_transfer" sequence="3"/>
+    <menuitem id="menu_otm_stock_issue" name="Stock Issues" parent="menu_otm_operations"
+              action="action_otm_stock_issue" sequence="4"/>
+    <menuitem id="menu_otm_stock_return" name="Stock Returns" parent="menu_otm_operations"
+              action="action_otm_stock_return" sequence="5"/>
+    <menuitem id="menu_otm_stock_adjustment" name="Stock Adjustments" parent="menu_otm_operations"
+              action="action_otm_stock_adjustment" sequence="6"/>
+
+    <menuitem id="menu_otm_stock" name="Stock" parent="menu_otm_store_root" sequence="20"/>
+    <menuitem id="menu_otm_stock_quant" name="Live Stock" parent="menu_otm_stock"
+              action="action_otm_stock_quant" sequence="1"/>
+    <menuitem id="menu_otm_stock_move" name="Stock Ledger" parent="menu_otm_stock"
+              action="action_otm_stock_move" sequence="2"/>
+    <menuitem id="menu_otm_product_batch" name="Batches / Expiry" parent="menu_otm_stock"
+              action="action_otm_product_batch" sequence="3"/>
+
+    <menuitem id="menu_otm_master_data" name="Master Data" parent="menu_otm_store_root" sequence="30"/>
+    <menuitem id="menu_otm_store" name="Stores" parent="menu_otm_master_data"
+              action="action_otm_store" sequence="1"/>
+    <menuitem id="menu_otm_store_location" name="Storage Locations" parent="menu_otm_master_data"
+              action="action_otm_store_location" sequence="2"/>
+
+</odoo>

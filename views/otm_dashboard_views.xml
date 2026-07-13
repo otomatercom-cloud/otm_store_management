@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_otm_dashboard" model="ir.actions.client">
+        <field name="name">Store Dashboard</field>
+        <field name="tag">otm_store_dashboard</field>
+    </record>
+
+</odoo>

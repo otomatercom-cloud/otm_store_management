@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_otm_stock_adjustment_list" model="ir.ui.view">
+        <field name="name">otm.stock.adjustment.list</field>
+        <field name="model">otm.stock.adjustment</field>
+        <field name="arch" type="xml">
+            <list string="Stock Adjustments" decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="store_id"/>
+                <field name="adjustment_date"/>
+                <field name="state" widget="badge" decoration-success="state == 'approved'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_otm_stock_adjustment_form" model="ir.ui.view">
+        <field name="name">otm.stock.adjustment.form</field>
+        <field name="model">otm.stock.adjustment</field>
+        <field name="arch" type="xml">
+            <form string="Stock Adjustment">
+                <header>
+                    <button name="action_load_expected" type="object" string="Load Expected Quantities"
+                            invisible="state != 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('cancelled', 'approved')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="store_id"/>
+                            <field name="adjustment_date"/>
+                        </group>
+                        <group>
+                            <field name="reason"/>
+                            <field name="approved_by" readonly="1" invisible="not approved_by"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Lines">
+                            <field name="line_ids" readonly="state in ('approved', 'cancelled')">
+                                <list editable="bottom">
+                                    <field name="product_tmpl_id"/>
+                                    <field name="batch_id"/>
+                                    <field name="expected_qty"/>
+                                    <field name="actual_qty"/>
+                                    <field name="difference" readonly="1"/>
+                                    <field name="unit_cost"/>
+                                    <field name="reason"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_otm_stock_adjustment_search" model="ir.ui.view">
+        <field name="name">otm.stock.adjustment.search</field>
+        <field name="model">otm.stock.adjustment</field>
+        <field name="arch" type="xml">
+            <search string="Stock Adjustments">
+                <field name="name"/>
+                <field name="store_id"/>
+                <group>
+                    <filter string="Store" name="group_store" context="{'group_by': 'store_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_otm_stock_adjustment" model="ir.actions.act_window">
+        <field name="name">Stock Adjustments</field>
+        <field name="res_model">otm.stock.adjustment</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_otm_stock_adjustment_search"/>
+    </record>
+
+</odoo>

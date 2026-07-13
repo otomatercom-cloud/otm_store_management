@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_otm_stock_receipt_list" model="ir.ui.view">
+        <field name="name">otm.stock.receipt.list</field>
+        <field name="model">otm.stock.receipt</field>
+        <field name="arch" type="xml">
+            <list string="Stock Receipts (GRN)">
+                <field name="name"/>
+                <field name="store_id"/>
+                <field name="vendor_id"/>
+                <field name="received_date"/>
+                <field name="received_by"/>
+                <field name="state" widget="badge" decoration-success="state == 'confirmed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_otm_stock_receipt_form" model="ir.ui.view">
+        <field name="name">otm.stock.receipt.form</field>
+        <field name="model">otm.stock.receipt</field>
+        <field name="arch" type="xml">
+            <form string="Stock Receipt (GRN)">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state != 'confirmed'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="purchase_id" readonly="1"/>
+                            <field name="vendor_id"/>
+                            <field name="store_id"/>
+                            <field name="location_id"/>
+                        </group>
+                        <group>
+                            <field name="invoice_number"/>
+                            <field name="received_date"/>
+                            <field name="received_by"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Lines">
+                            <field name="line_ids" readonly="state == 'confirmed'">
+                                <list editable="bottom">
+                                    <field name="product_tmpl_id"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="batch_id"/>
+                                    <field name="batch_number"/>
+                                    <field name="manufacturing_date"/>
+                                    <field name="expiry_date"/>
+                                    <field name="purchase_price"/>
+                                    <field name="selling_price"/>
+                                    <field name="gst_percent"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_otm_stock_receipt_search" model="ir.ui.view">
+        <field name="name">otm.stock.receipt.search</field>
+        <field name="model">otm.stock.receipt</field>
+        <field name="arch" type="xml">
+            <search string="Stock Receipts">
+                <field name="name"/>
+                <field name="store_id"/>
+                <field name="vendor_id"/>
+                <group>
+                    <filter string="Store" name="group_store" context="{'group_by': 'store_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_otm_stock_receipt" model="ir.actions.act_window">
+        <field name="name">Stock Receipts (GRN)</field>
+        <field name="res_model">otm.stock.receipt</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_otm_stock_receipt_search"/>
+    </record>
+
+</odoo>

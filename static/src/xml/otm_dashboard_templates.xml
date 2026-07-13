@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="otm_store_management.Dashboard" owl="1">
+        <div class="otm_dashboard p-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2>Store Management Dashboard</h2>
+            </div>
+
+            <div t-if="state.loading" class="text-muted">Loading dashboard...</div>
+
+            <div t-else="">
+                <div class="otm_kpi_row">
+                    <div class="otm_kpi_card" t-on-click="onOpenStores">
+                        <div class="otm_kpi_value"><t t-esc="state.cards.total_stores"/></div>
+                        <div class="otm_kpi_label">Total Stores</div>
+                    </div>
+                    <div class="otm_kpi_card">
+                        <div class="otm_kpi_value"><t t-esc="state.cards.total_products"/></div>
+                        <div class="otm_kpi_label">Total Products</div>
+                    </div>
+                    <div class="otm_kpi_card">
+                        <div class="otm_kpi_value"><t t-esc="state.cards.inventory_value"/></div>
+                        <div class="otm_kpi_label">Inventory Value</div>
+                    </div>
+                    <div class="otm_kpi_card">
+                        <div class="otm_kpi_value"><t t-esc="state.cards.today_purchase"/></div>
+                        <div class="otm_kpi_label">Today's Purchase</div>
+                    </div>
+                    <div class="otm_kpi_card">
+                        <div class="otm_kpi_value"><t t-esc="state.cards.today_transfer"/></div>
+                        <div class="otm_kpi_label">Today's Transfer</div>
+                    </div>
+                    <div class="otm_kpi_card">
+                        <div class="otm_kpi_value"><t t-esc="state.cards.today_issue"/></div>
+                        <div class="otm_kpi_label">Today's Issue</div>
+                    </div>
+                    <div class="otm_kpi_card otm_kpi_warning" t-on-click="onOpenLowStock">
+                        <div class="otm_kpi_value"><t t-esc="state.cards.low_stock"/></div>
+                        <div class="otm_kpi_label">Low Stock</div>
+                    </div>
+                    <div class="otm_kpi_card otm_kpi_danger" t-on-click="onOpenExpiry">
+                        <div class="otm_kpi_value"><t t-esc="state.cards.expired"/></div>
+                        <div class="otm_kpi_label">Expired</div>
+                    </div>
+                    <div class="otm_kpi_card otm_kpi_warning" t-on-click="onOpenExpiry">
+                        <div class="otm_kpi_value"><t t-esc="state.cards.near_expiry"/></div>
+                        <div class="otm_kpi_label">Near Expiry</div>
+                    </div>
+                    <div class="otm_kpi_card" t-on-click="onOpenLedger">
+                        <div class="otm_kpi_value"><t t-esc="state.cards.pending_approvals"/></div>
+                        <div class="otm_kpi_label">Pending Approvals</div>
+                    </div>
+                </div>
+
+                <div class="otm_chart_row">
+                    <div class="otm_chart_card">
+                        <h4>Department Wise Consumption (this month)</h4>
+                        <div t-if="!state.departmentConsumption.length" class="text-muted">No data yet.</div>
+                        <div t-foreach="state.departmentConsumption" t-as="item" t-key="item.label" class="otm_bar_row">
+                            <span class="otm_bar_label"><t t-esc="item.label"/></span>
+                            <div class="otm_bar_track">
+                                <div class="otm_bar_fill" t-attf-style="width: {{barWidth(item.value, state.departmentConsumption)}}"/>
+                            </div>
+                            <span class="otm_bar_value"><t t-esc="item.value"/></span>
+                        </div>
+                    </div>
+
+                    <div class="otm_chart_card">
+                        <h4>Store Wise Stock Value</h4>
+                        <div t-if="!state.storeWiseStock.length" class="text-muted">No data yet.</div>
+                        <div t-foreach="state.storeWiseStock" t-as="item" t-key="item.label" class="otm_bar_row">
+                            <span class="otm_bar_label"><t t-esc="item.label"/></span>
+                            <div class="otm_bar_track">
+                                <div class="otm_bar_fill otm_bar_fill_alt" t-attf-style="width: {{barWidth(item.value, state.storeWiseStock)}}"/>
+                            </div>
+                            <span class="otm_bar_value"><t t-esc="item.value"/></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="otm_chart_row">
+                    <div class="otm_chart_card">
+                        <h4>Monthly Purchase Value</h4>
+                        <div class="otm_kpi_value"><t t-esc="state.monthlyPurchaseValue"/></div>
+                    </div>
+                    <div class="otm_chart_card">
+                        <h4>Monthly Consumption Value</h4>
+                        <div class="otm_kpi_value"><t t-esc="state.monthlyConsumptionValue"/></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>

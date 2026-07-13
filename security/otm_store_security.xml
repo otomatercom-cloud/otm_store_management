@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- Odoo 19: res.groups.category_id was removed in favour of
+             res.groups.privilege. Create the privilege first, then link
+             each group to it via privilege_id. -->
+        <record id="otm_privilege_store_management" model="res.groups.privilege">
+            <field name="name">Store Management</field>
+            <field name="category_id" ref="base.module_category_inventory_inventory"/>
+        </record>
+
+        <record id="group_otm_department_manager" model="res.groups">
+            <field name="name">Store Management / Department Manager</field>
+            <field name="privilege_id" ref="otm_privilege_store_management"/>
+            <field name="comment">Can request stock issues/returns for their own department and view live stock.</field>
+        </record>
+
+        <record id="group_otm_store_manager" model="res.groups">
+            <field name="name">Store Management / Store Manager</field>
+            <field name="privilege_id" ref="otm_privilege_store_management"/>
+            <field name="implied_ids" eval="[(4, ref('group_otm_department_manager'))]"/>
+            <field name="comment">Manages one or more stores: receipts, transfers, issues, returns and adjustments.</field>
+        </record>
+
+        <record id="group_otm_purchase_manager" model="res.groups">
+            <field name="name">Store Management / Purchase Manager</field>
+            <field name="privilege_id" ref="otm_privilege_store_management"/>
+            <field name="implied_ids" eval="[(4, ref('group_otm_store_manager'))]"/>
+            <field name="comment">Creates and confirms purchases and stock receipts.</field>
+        </record>
+
+        <record id="group_otm_inventory_manager" model="res.groups">
+            <field name="name">Store Management / Inventory Manager</field>
+            <field name="privilege_id" ref="otm_privilege_store_management"/>
+            <field name="implied_ids" eval="[(4, ref('group_otm_purchase_manager'))]"/>
+            <field name="comment">Full operational control across all stores, approves transfers and adjustments.</field>
+        </record>
+
+        <record id="group_otm_auditor" model="res.groups">
+            <field name="name">Store Management / Auditor</field>
+            <field name="privilege_id" ref="otm_privilege_store_management"/>
+            <field name="comment">Read-only access to all stores, ledger and reports for audit purposes.</field>
+        </record>
+
+        <record id="group_otm_admin" model="res.groups">
+            <field name="name">Store Management / Administrator</field>
+            <field name="privilege_id" ref="otm_privilege_store_management"/>
+            <field name="implied_ids" eval="[(4, ref('group_otm_inventory_manager'))]"/>
+            <field name="comment">Full configuration access including master data, security and permanent ledger edits.</field>
+            <field name="user_ids" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_otm_stock_quant_list" model="ir.ui.view">
+        <field name="name">otm.stock.quant.list</field>
+        <field name="model">otm.stock.quant</field>
+        <field name="arch" type="xml">
+            <list string="Live Stock" create="false" edit="false" delete="false">
+                <field name="product_tmpl_id"/>
+                <field name="batch_id" optional="show"/>
+                <field name="store_id"/>
+                <field name="location_id" optional="hide"/>
+                <field name="quantity"/>
+                <field name="average_cost" optional="show"/>
+                <field name="value" widget="monetary"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_otm_stock_quant_pivot" model="ir.ui.view">
+        <field name="name">otm.stock.quant.pivot</field>
+        <field name="model">otm.stock.quant</field>
+        <field name="arch" type="xml">
+            <pivot string="Store-wise / Category-wise Stock">
+                <field name="store_id" type="row"/>
+                <field name="product_tmpl_id" type="col"/>
+                <field name="quantity" type="measure"/>
+                <field name="value" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_otm_stock_quant_search" model="ir.ui.view">
+        <field name="name">otm.stock.quant.search</field>
+        <field name="model">otm.stock.quant</field>
+        <field name="arch" type="xml">
+            <search string="Live Stock">
+                <field name="product_tmpl_id"/>
+                <field name="store_id"/>
+                <field name="batch_id"/>
+                <group>
+                    <filter string="Store" name="group_store" context="{'group_by': 'store_id'}"/>
+                    <filter string="Product" name="group_product" context="{'group_by': 'product_tmpl_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_otm_stock_quant" model="ir.actions.act_window">
+        <field name="name">Live Stock</field>
+        <field name="res_model">otm.stock.quant</field>
+        <field name="view_mode">list,pivot</field>
+        <field name="search_view_id" ref="view_otm_stock_quant_search"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_otm_product_batch_list" model="ir.ui.view">
+        <field name="name">otm.product.batch.list</field>
+        <field name="model">otm.product.batch</field>
+        <field name="arch" type="xml">
+            <list string="Product Batches"
+                  decoration-danger="expiry_state == 'expired'"
+                  decoration-warning="expiry_state == 'near_expiry'">
+                <field name="name"/>
+                <field name="product_tmpl_id"/>
+                <field name="manufacturing_date"/>
+                <field name="expiry_date"/>
+                <field name="current_qty"/>
+                <field name="purchase_price"/>
+                <field name="vendor_id" optional="show"/>
+                <field name="expiry_state" widget="badge"
+                       decoration-success="expiry_state == 'ok'"
+                       decoration-warning="expiry_state == 'near_expiry'"
+                       decoration-danger="expiry_state == 'expired'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_otm_product_batch_form" model="ir.ui.view">
+        <field name="name">otm.product.batch.form</field>
+        <field name="model">otm.product.batch</field>
+        <field name="arch" type="xml">
+            <form string="Product Batch">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="product_tmpl_id"/>
+                            <field name="vendor_id"/>
+                        </group>
+                        <group>
+                            <field name="manufacturing_date"/>
+                            <field name="expiry_date"/>
+                            <field name="expiry_state" readonly="1"/>
+                            <field name="days_to_expiry" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Pricing">
+                            <field name="purchase_price"/>
+                            <field name="selling_price"/>
+                        </group>
+                        <group string="Live Stock">
+                            <field name="current_qty" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_otm_product_batch_search" model="ir.ui.view">
+        <field name="name">otm.product.batch.search</field>
+        <field name="model">otm.product.batch</field>
+        <field name="arch" type="xml">
+            <search string="Product Batches">
+                <field name="name"/>
+                <field name="product_tmpl_id"/>
+                <filter string="Expired" name="expired" domain="[('expiry_state', '=', 'expired')]"/>
+                <filter string="Near Expiry" name="near_expiry" domain="[('expiry_state', '=', 'near_expiry')]"/>
+                <group>
+                    <filter string="Product" name="group_product" context="{'group_by': 'product_tmpl_id'}"/>
+                    <filter string="Expiry Status" name="group_expiry" context="{'group_by': 'expiry_state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_otm_product_batch" model="ir.actions.act_window">
+        <field name="name">Product Batches</field>
+        <field name="res_model">otm.product.batch</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_otm_product_batch_search"/>
+    </record>
+
+</odoo>

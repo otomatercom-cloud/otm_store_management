@@ -1,0 +1,102 @@
+.otm_dashboard {
+    max-width: 1200px;
+}
+
+.otm_kpi_row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.otm_kpi_card {
+    flex: 1 1 160px;
+    min-width: 150px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: box-shadow 0.15s ease-in-out;
+}
+
+.otm_kpi_card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.otm_kpi_value {
+    font-size: 24px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.otm_kpi_label {
+    font-size: 12px;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.otm_kpi_warning .otm_kpi_value {
+    color: #e0a800;
+}
+
+.otm_kpi_danger .otm_kpi_value {
+    color: #dc3545;
+}
+
+.otm_chart_row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.otm_chart_card {
+    flex: 1 1 420px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 16px;
+}
+
+.otm_bar_row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.otm_bar_label {
+    flex: 0 0 140px;
+    font-size: 13px;
+    color: #495057;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.otm_bar_track {
+    flex: 1 1 auto;
+    background: #f1f3f5;
+    border-radius: 4px;
+    height: 14px;
+    overflow: hidden;
+}
+
+.otm_bar_fill {
+    background: #4c6ef5;
+    height: 100%;
+    border-radius: 4px;
+}
+
+.otm_bar_fill_alt {
+    background: #12b886;
+}
+
+.otm_bar_value {
+    flex: 0 0 70px;
+    text-align: right;
+    font-size: 13px;
+    color: #495057;
+}

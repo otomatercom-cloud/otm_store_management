@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_otm_store_list" model="ir.ui.view">
+        <field name="name">otm.store.list</field>
+        <field name="model">otm.store</field>
+        <field name="arch" type="xml">
+            <list string="Stores">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="manager_id"/>
+                <field name="department"/>
+                <field name="location_count"/>
+                <field name="product_count"/>
+                <field name="inventory_value" widget="monetary" optional="show"/>
+                <field name="low_stock_count" decoration-danger="low_stock_count &gt; 0"/>
+                <field name="status" widget="badge"
+                       decoration-success="status == 'active'"
+                       decoration-muted="status == 'inactive'"
+                       decoration-danger="status == 'closed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_otm_store_form" model="ir.ui.view">
+        <field name="name">otm.store.form</field>
+        <field name="model">otm.store</field>
+        <field name="arch" type="xml">
+            <form string="Store">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="active,inactive,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_locations" type="object" class="oe_stat_button" icon="fa-map-marker">
+                            <field name="location_count" widget="statinfo" string="Locations"/>
+                        </button>
+                        <button name="action_view_live_stock" type="object" class="oe_stat_button" icon="fa-cubes">
+                            <field name="product_count" widget="statinfo" string="Products"/>
+                        </button>
+                        <button name="action_view_ledger" type="object" class="oe_stat_button" icon="fa-list-alt">
+                            <span class="o_stat_text">Ledger</span>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Main Store"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="manager_id"/>
+                            <field name="department"/>
+                        </group>
+                        <group>
+                            <field name="location"/>
+                            <field name="active" invisible="1"/>
+                            <field name="inventory_value" widget="monetary"/>
+                            <field name="low_stock_count"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1" placeholder="Notes about this store..."/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_otm_store_kanban" model="ir.ui.view">
+        <field name="name">otm.store.kanban</field>
+        <field name="model">otm.store</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="product_count"/>
+                <field name="low_stock_count"/>
+                <field name="status"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click p-2">
+                            <strong><field name="name"/></strong>
+                            <div class="text-muted"><field name="code"/></div>
+                            <div>
+                                Products: <field name="product_count"/> |
+                                Low Stock: <field name="low_stock_count"/>
+                            </div>
+                            <span class="badge rounded-pill text-bg-success" invisible="status != 'active'">Active</span>
+                            <span class="badge rounded-pill text-bg-secondary" invisible="status == 'active'">Inactive</span>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_otm_store_search" model="ir.ui.view">
+        <field name="name">otm.store.search</field>
+        <field name="model">otm.store</field>
+        <field name="arch" type="xml">
+            <search string="Stores">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="manager_id"/>
+                <filter string="Active" name="active" domain="[('status', '=', 'active')]"/>
+                <group>
+                    <filter string="Manager" name="group_manager" context="{'group_by': 'manager_id'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_otm_store" model="ir.actions.act_window">
+        <field name="name">Stores</field>
+        <field name="res_model">otm.store</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="view_otm_store_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first store</p>
+            <p>Stores represent any physical stock-holding point: Main Store, Kitchen, Freezer, Hostel Store, IT Store, etc.</p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="demo_store_main" model="otm.store">
+            <field name="name">Main Store</field>
+            <field name="code">MAIN</field>
+            <field name="department">General</field>
+        </record>
+
+        <record id="demo_store_kitchen" model="otm.store">
+            <field name="name">Kitchen Store</field>
+            <field name="code">KITCHEN</field>
+            <field name="department">Catering</field>
+        </record>
+
+        <record id="demo_store_freezer" model="otm.store">
+            <field name="name">Freezer</field>
+            <field name="code">FREEZER</field>
+            <field name="department">Catering</field>
+        </record>
+
+        <record id="demo_store_hostel" model="otm.store">
+            <field name="name">Hostel Store</field>
+            <field name="code">HOSTEL</field>
+            <field name="department">Hostel</field>
+        </record>
+
+        <record id="demo_location_main_rack_a" model="otm.store.location">
+            <field name="name">Rack A</field>
+            <field name="store_id" ref="demo_store_main"/>
+            <field name="location_type">rack</field>
+        </record>
+
+        <record id="demo_location_main_rack_b" model="otm.store.location">
+            <field name="name">Rack B</field>
+            <field name="store_id" ref="demo_store_main"/>
+            <field name="location_type">rack</field>
+        </record>
+
+        <record id="demo_location_freezer_shelf1" model="otm.store.location">
+            <field name="name">Shelf 1</field>
+            <field name="store_id" ref="demo_store_freezer"/>
+            <field name="location_type">cold_storage</field>
+        </record>
+
+        <record id="demo_product_rice" model="product.template">
+            <field name="name">Rice (25kg Bag)</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="uom.product_uom_kgm"/>
+            <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+            <field name="otm_gst_percent">5.0</field>
+            <field name="otm_hsn_code">1006</field>
+            <field name="otm_min_qty">50</field>
+            <field name="otm_reorder_qty">100</field>
+            <field name="otm_critical_qty">25</field>
+            <field name="otm_is_perishable">False</field>
+            <field name="otm_storage_type">normal</field>
+        </record>
+
+        <record id="demo_product_sugar" model="product.template">
+            <field name="name">Sugar</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="uom.product_uom_kgm"/>
+            <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+            <field name="otm_gst_percent">5.0</field>
+            <field name="otm_hsn_code">1701</field>
+            <field name="otm_min_qty">100</field>
+            <field name="otm_reorder_qty">100</field>
+            <field name="otm_critical_qty">20</field>
+            <field name="otm_is_perishable">False</field>
+            <field name="otm_storage_type">normal</field>
+        </record>
+
+        <record id="demo_product_milk" model="product.template">
+            <field name="name">Milk (1L Packet)</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="uom.product_uom_litre"/>
+            <field name="uom_po_id" ref="uom.product_uom_litre"/>
+            <field name="otm_gst_percent">0.0</field>
+            <field name="otm_hsn_code">0401</field>
+            <field name="otm_min_qty">20</field>
+            <field name="otm_reorder_qty">30</field>
+            <field name="otm_critical_qty">10</field>
+            <field name="otm_is_perishable">True</field>
+            <field name="otm_shelf_life_days">3</field>
+            <field name="otm_expiry_alert_days">1</field>
+            <field name="otm_storage_type">cold</field>
+        </record>
+
+        <record id="demo_purchase_1" model="otm.purchase">
+            <field name="store_id" ref="demo_store_main"/>
+            <field name="purchase_type">opening</field>
+            <field name="purchase_date" eval="time.strftime('%Y-%m-%d')"/>
+            <field name="line_ids" eval="[(0, 0, {
+                'product_tmpl_id': ref('demo_product_rice'),
+                'quantity': 200,
+                'unit_price': 45.0,
+            }), (0, 0, {
+                'product_tmpl_id': ref('demo_product_sugar'),
+                'quantity': 150,
+                'unit_price': 40.0,
+            })]"/>
+        </record>
+
+    </data>
+</odoo>

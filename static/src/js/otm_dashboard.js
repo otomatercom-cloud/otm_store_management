@@ -29,7 +29,7 @@ class OtmStoreDashboard extends Component {
 
     async loadData() {
         this.state.loading = true;
-        const data = await this.orm.call("otm.dashboard", "get_dashboard_data", []);
+        const data = await this.orm.call("otm.dashboard", "get_dashboard_data", [[]]);
         this.state.cards = data.cards;
         this.state.departmentConsumption = data.department_consumption;
         this.state.storeWiseStock = data.store_wise_stock;

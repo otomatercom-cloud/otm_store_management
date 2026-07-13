@@ -34,7 +34,10 @@
                     </group>
                     <group string="Live Stock">
                         <field name="otm_current_qty" readonly="1"/>
-                        <field name="otm_is_low_stock" readonly="1"/>
+                        <field name="otm_stock_status" readonly="1" widget="badge"
+                               decoration-success="otm_stock_status == 'ok'"
+                               decoration-warning="otm_stock_status == 'low'"
+                               decoration-danger="otm_stock_status in ('critical', 'out')"/>
                     </group>
                     <group string="Consumption &amp; Reorder Forecast">
                         <group>

@@ -40,6 +40,5 @@ class OtmStockQuant(models.Model):
                     SUM(m.total_cost) AS value
                 FROM otm_stock_move m
                 GROUP BY m.product_tmpl_id, m.batch_id, m.store_id, m.location_id
-                HAVING SUM(m.quantity) != 0
             )
         """)

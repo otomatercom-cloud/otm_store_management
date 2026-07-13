@@ -31,6 +31,13 @@ class ProductTemplate(models.Model):
     otm_quant_ids = fields.One2many('otm.stock.quant', 'product_tmpl_id', string='Live Stock')
     otm_current_qty = fields.Float(compute='_compute_otm_stock', string='Current Stock')
     otm_is_low_stock = fields.Boolean(compute='_compute_otm_stock', string='Low Stock', search='_search_low_stock')
+    otm_is_stock_out = fields.Boolean(compute='_compute_otm_stock', string='Stock Out', search='_search_stock_out')
+    otm_stock_status = fields.Selection([
+        ('ok', 'OK'),
+        ('low', 'Low Stock'),
+        ('critical', 'Critical'),
+        ('out', 'Stock Out'),
+    ], compute='_compute_otm_stock', string='Stock Status')
 
     otm_last_month_consumption = fields.Float(
         compute='_compute_otm_consumption', string='Last Month Consumption',
@@ -54,6 +61,15 @@ class ProductTemplate(models.Model):
             qty = sum(quants.mapped('quantity'))
             product.otm_current_qty = qty
             product.otm_is_low_stock = bool(product.otm_reorder_qty) and qty <= product.otm_reorder_qty
+            product.otm_is_stock_out = qty <= 0
+            if qty <= 0:
+                product.otm_stock_status = 'out'
+            elif product.otm_critical_qty and qty <= product.otm_critical_qty:
+                product.otm_stock_status = 'critical'
+            elif product.otm_reorder_qty and qty <= product.otm_reorder_qty:
+                product.otm_stock_status = 'low'
+            else:
+                product.otm_stock_status = 'ok'
 
     def _compute_otm_consumption(self):
         Move = self.env['otm.stock.move']
@@ -90,3 +106,12 @@ class ProductTemplate(models.Model):
         if (operator == '=' and value) or (operator == '!=' and not value):
             return [('id', 'in', low_ids)]
         return [('id', 'not in', low_ids)]
+
+    def _search_stock_out(self, operator, value):
+        out_ids = []
+        for product in self.search([]):
+            if product.otm_is_stock_out:
+                out_ids.append(product.id)
+        if (operator == '=' and value) or (operator == '!=' and not value):
+            return [('id', 'in', out_ids)]
+        return [('id', 'not in', out_ids)]

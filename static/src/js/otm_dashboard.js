@@ -71,7 +71,11 @@ class OtmStoreDashboard extends Component {
     }
 
     gaugeIsCritical(item) {
-        return item.days_of_cover !== null && item.days_of_cover !== false && item.days_of_cover <= 3;
+        return item.status === 'out' || item.status === 'critical';
+    }
+
+    isStockOut(item) {
+        return item.status === 'out';
     }
 
     coverLabel(item) {

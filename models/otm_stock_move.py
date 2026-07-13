@@ -65,6 +65,38 @@ class OtmStockMove(models.Model):
         for move in self:
             move.total_cost = move.quantity * move.unit_cost
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if (vals.get('quantity') or 0.0) < 0:
+                self._check_sufficient_stock(vals)
+        return super().create(vals_list)
+
+    def _check_sufficient_stock(self, vals):
+        """Raise if posting this outgoing quantity would take the balance
+        for this product/store (and batch, if given) below zero. Checked
+        at store level, not location level, since issue/transfer/adjustment
+        lines treat stock within a store as fungible across locations."""
+        domain = [
+            ('product_tmpl_id', '=', vals.get('product_tmpl_id')),
+            ('store_id', '=', vals.get('store_id')),
+        ]
+        if vals.get('batch_id'):
+            domain.append(('batch_id', '=', vals['batch_id']))
+        current_balance = sum(self.search(domain).mapped('quantity'))
+        resulting_balance = current_balance + vals.get('quantity', 0.0)
+        if resulting_balance < -0.0001:
+            product = self.env['product.template'].browse(vals.get('product_tmpl_id'))
+            store = self.env['otm.store'].browse(vals.get('store_id'))
+            uom_name = product.uom_id.name or 'unit(s)'
+            raise UserError(
+                f'Not enough stock: {product.name} at {store.name} has {current_balance:g} '
+                f'{uom_name} on hand, which is not enough to cover this movement of '
+                f'{abs(vals.get("quantity", 0.0)):g} {uom_name}. Reduce the quantity, choose a '
+                f'different store or batch, or post a stock adjustment first if the recorded '
+                f'balance is wrong.'
+            )
+
     def unlink(self):
         if not self.env.user.has_group('otm_store_management.group_otm_admin'):
             raise UserError('Ledger entries are permanent records and cannot be deleted. '

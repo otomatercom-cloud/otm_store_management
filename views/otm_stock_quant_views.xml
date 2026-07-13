@@ -5,7 +5,8 @@
         <field name="name">otm.stock.quant.list</field>
         <field name="model">otm.stock.quant</field>
         <field name="arch" type="xml">
-            <list string="Live Stock" create="false" edit="false" delete="false">
+            <list string="Live Stock" create="false" edit="false" delete="false"
+                  decoration-danger="quantity &lt;= 0" decoration-muted="quantity &lt; 0">
                 <field name="product_tmpl_id"/>
                 <field name="batch_id" optional="show"/>
                 <field name="store_id"/>
@@ -38,6 +39,8 @@
                 <field name="product_tmpl_id"/>
                 <field name="store_id"/>
                 <field name="batch_id"/>
+                <filter string="In Stock" name="in_stock" domain="[('quantity', '&gt;', 0)]"/>
+                <filter string="Out of Stock" name="out_of_stock" domain="[('quantity', '&lt;=', 0)]"/>
                 <group>
                     <filter string="Store" name="group_store" context="{'group_by': 'store_id'}"/>
                     <filter string="Product" name="group_product" context="{'group_by': 'product_tmpl_id'}"/>

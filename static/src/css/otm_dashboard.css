@@ -266,6 +266,22 @@
     font-weight: 600;
 }
 
+.otm_status_tag {
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+.otm_status_tag.out {
+    background: var(--otm-red);
+    color: #fff;
+}
+.otm_status_tag.critical {
+    background: var(--otm-red-soft);
+    color: var(--otm-red);
+}
+
 .otm_gauge_wrap {
     min-width: 0;
 }
@@ -331,6 +347,11 @@
 .otm_cover_tag.warn {
     background: var(--otm-amber-soft);
     color: var(--otm-amber);
+}
+
+.otm_cover_tag.out {
+    background: var(--otm-red);
+    color: #fff;
 }
 
 .otm_cover_tag .n {

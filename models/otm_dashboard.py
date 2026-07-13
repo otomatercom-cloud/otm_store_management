@@ -30,22 +30,38 @@ class OtmDashboard(models.AbstractModel):
 
         low_stock_rows = []
         for (store, product), qty in store_product_qty.items():
-            if product.otm_reorder_qty and qty <= product.otm_reorder_qty:
+            is_out = qty <= 0
+            is_below_reorder = bool(product.otm_reorder_qty) and qty <= product.otm_reorder_qty
+            if is_out or is_below_reorder:
+                if is_out:
+                    status = 'out'
+                elif product.otm_critical_qty and qty <= product.otm_critical_qty:
+                    status = 'critical'
+                else:
+                    status = 'low'
                 avg_daily = product.otm_avg_daily_consumption
                 days_cover = round(qty / avg_daily, 1) if avg_daily > 0 else None
                 low_stock_rows.append({
                     'product': product.name,
                     'store': store.name,
+                    'status': status,
                     'current_qty': round(qty, 2),
                     'reorder_qty': product.otm_reorder_qty,
+                    'critical_qty': product.otm_critical_qty,
                     'max_qty': product.otm_max_qty,
                     'uom': product.uom_id.name,
                     'last_month_consumption': round(product.otm_last_month_consumption, 2),
                     'avg_daily_consumption': round(avg_daily, 2),
                     'days_of_cover': days_cover,
                 })
-        # most urgent (fewest days of cover) first; unknown rate goes last
-        low_stock_rows.sort(key=lambda r: (r['days_of_cover'] is None, r['days_of_cover'] or 0))
+        # most urgent first: stock-out, then critical, then low; within a
+        # tier, fewest days of cover first (unknown rate goes last)
+        _severity_rank = {'out': 0, 'critical': 1, 'low': 2}
+        low_stock_rows.sort(key=lambda r: (
+            _severity_rank[r['status']],
+            r['days_of_cover'] is None,
+            r['days_of_cover'] or 0,
+        ))
 
         batches = Batch.search([])
         expired = batches.filtered(lambda b: b.expiry_state == 'expired')
@@ -88,6 +104,7 @@ class OtmDashboard(models.AbstractModel):
                 'today_transfer': transfer_today,
                 'today_issue': issue_today,
                 'low_stock': len(low_stock_rows),
+                'stock_out': len([r for r in low_stock_rows if r['status'] == 'out']),
                 'expired': len(expired),
                 'near_expiry': len(near_expiry),
                 'pending_approvals': pending_approvals,

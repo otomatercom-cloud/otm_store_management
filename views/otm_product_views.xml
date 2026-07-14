@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_otm_product_list" model="ir.ui.view">
+        <field name="name">product.template.list.otm</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <list string="Products" decoration-danger="otm_stock_status in ('critical', 'out')"
+                  decoration-warning="otm_stock_status == 'low'">
+                <field name="default_code" optional="show"/>
+                <field name="name"/>
+                <field name="otm_hsn_code" optional="show"/>
+                <field name="uom_id"/>
+                <field name="otm_current_qty"/>
+                <field name="otm_reorder_qty" optional="show"/>
+                <field name="otm_critical_qty" optional="hide"/>
+                <field name="otm_stock_status" widget="badge"
+                       decoration-success="otm_stock_status == 'ok'"
+                       decoration-warning="otm_stock_status == 'low'"
+                       decoration-danger="otm_stock_status in ('critical', 'out')"/>
+                <field name="otm_gst_percent" optional="hide"/>
+                <field name="list_price" optional="show" widget="monetary"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_otm_product_search" model="ir.ui.view">
+        <field name="name">product.template.search.otm</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <search string="Products">
+                <field name="name"/>
+                <field name="default_code"/>
+                <field name="otm_hsn_code"/>
+                <filter string="Low Stock" name="low_stock" domain="[('otm_is_low_stock', '=', True)]"/>
+                <filter string="Stock Out" name="stock_out" domain="[('otm_is_stock_out', '=', True)]"/>
+                <filter string="Perishable" name="perishable" domain="[('otm_is_perishable', '=', True)]"/>
+                <group>
+                    <filter string="Storage Type" name="group_storage" context="{'group_by': 'otm_storage_type'}"/>
+                    <filter string="Preferred Vendor" name="group_vendor" context="{'group_by': 'otm_preferred_vendor_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_otm_product" model="ir.actions.act_window">
+        <field name="name">Products</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_otm_product_list"/>
+        <field name="search_view_id" ref="view_otm_product_search"/>
+        <field name="context">{'default_type': 'consu', 'default_is_storable': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add your first product</p>
+            <p>Products here are shared with the rest of Odoo. Open the "Store Management" tab on
+               any product to set GST/HSN, reorder levels, and see its live stock.</p>
+        </field>
+    </record>
+
+</odoo>

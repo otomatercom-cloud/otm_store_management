@@ -40,6 +40,7 @@
 
                     <div class="otm_side_group_label">Master Data</div>
                     <ul class="otm_side_nav">
+                        <li><a href="#" t-on-click.prevent="() => this.navigate('action_otm_product')">Products</a></li>
                         <li><a href="#" t-on-click.prevent="() => this.navigate('action_otm_store')">Stores</a></li>
                         <li><a href="#" t-on-click.prevent="() => this.navigate('action_otm_store_location')">Storage Locations</a></li>
                     </ul>
@@ -52,7 +53,10 @@
                             <span class="otm_page_eyebrow">Store Management</span>
                             <h2>Dashboard</h2>
                         </div>
-                        <span class="otm_page_sub">Live view of stock across all stores</span>
+                        <span class="otm_page_sub_wrap">
+                            <span class="otm_page_sub">Live view of stock across all stores</span>
+                            <button type="button" class="otm_add_product_btn" t-on-click="onAddProduct">+ Add Product</button>
+                        </span>
                     </div>
 
                     <div t-if="state.loading" class="text-muted">Loading dashboard...</div>
@@ -119,7 +123,7 @@
                                 <div class="otm_kpi_value"><t t-esc="state.cards.total_stores"/></div>
                                 <div class="otm_kpi_label">Total Stores</div>
                             </div>
-                            <div class="otm_kpi_card">
+                            <div class="otm_kpi_card" t-on-click="onOpenProducts">
                                 <div class="otm_kpi_value"><t t-esc="state.cards.total_products"/></div>
                                 <div class="otm_kpi_label">Total Products</div>
                             </div>

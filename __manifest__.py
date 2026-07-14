@@ -40,6 +40,7 @@ Key capabilities:
         'views/otm_store_views.xml',
         'views/otm_store_location_views.xml',
         'views/product_template_views.xml',
+        'views/otm_product_views.xml',
         'views/otm_product_batch_views.xml',
         'views/otm_purchase_views.xml',
         'views/otm_stock_receipt_views.xml',

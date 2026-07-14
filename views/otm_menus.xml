@@ -30,9 +30,11 @@
               action="action_otm_product_batch" sequence="3"/>
 
     <menuitem id="menu_otm_master_data" name="Master Data" parent="menu_otm_store_root" sequence="30"/>
+    <menuitem id="menu_otm_product" name="Products" parent="menu_otm_master_data"
+              action="action_otm_product" sequence="1"/>
     <menuitem id="menu_otm_store" name="Stores" parent="menu_otm_master_data"
-              action="action_otm_store" sequence="1"/>
+              action="action_otm_store" sequence="2"/>
     <menuitem id="menu_otm_store_location" name="Storage Locations" parent="menu_otm_master_data"
-              action="action_otm_store_location" sequence="2"/>
+              action="action_otm_store_location" sequence="3"/>
 
 </odoo>

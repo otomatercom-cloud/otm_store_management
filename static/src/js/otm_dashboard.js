@@ -98,6 +98,20 @@ class OtmStoreDashboard extends Component {
         this.action.doAction("otm_store_management.action_otm_store");
     }
 
+    onOpenProducts() {
+        this.action.doAction("otm_store_management.action_otm_product");
+    }
+
+    onAddProduct() {
+        this.action.doAction({
+            type: "ir.actions.act_window",
+            res_model: "product.template",
+            views: [[false, "form"]],
+            target: "current",
+            context: { default_type: "consu", default_is_storable: true },
+        });
+    }
+
     onOpenLowStock() {
         this.action.doAction("otm_store_management.action_otm_stock_quant");
     }

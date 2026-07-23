@@ -123,8 +123,12 @@ class OtmPurchaseLine(models.Model):
     product_tmpl_id = fields.Many2one('product.template', string='Product', required=True)
     quantity = fields.Float(string='Quantity', required=True, default=1.0)
     uom_id = fields.Many2one('uom.uom', string='UoM')
-    unit_price = fields.Float(string='Unit Price', required=True)
-    selling_price = fields.Float(string='Selling Price')
+    unit_price = fields.Float(string='Purchase Rate', required=True,
+                               help='The rate you pay the vendor per unit — this is what gets posted '
+                                    'as the stock cost, not the selling rate.')
+    selling_price = fields.Float(string='Selling Rate',
+                                  help='Optional — the rate this batch will be sold/issued at. '
+                                       'Has no effect on stock cost or the purchase ledger.')
     gst_percent = fields.Float(string='GST %')
     taxable_amount = fields.Float(compute='_compute_tax', store=True)
     cgst_amount = fields.Float(compute='_compute_tax', store=True)

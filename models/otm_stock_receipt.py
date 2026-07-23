@@ -38,12 +38,22 @@ class OtmStockReceipt(models.Model):
     def action_confirm(self):
         Move = self.env['otm.stock.move']
         Batch = self.env['otm.product.batch']
+        all_new_lines = []  # for the toast notification across every receipt confirmed in this call
         for receipt in self:
             if receipt.state == 'confirmed':
                 continue
             if not receipt.line_ids:
                 raise UserError('Add at least one line before confirming the receipt.')
+            new_to_store_lines = []
             for line in receipt.line_ids:
+                # was this product ever stocked at this store before? (checked
+                # before posting this line's own move, so it reflects the
+                # true "first appearance" moment)
+                is_new_to_store = not Move.search_count([
+                    ('product_tmpl_id', '=', line.product_tmpl_id.id),
+                    ('store_id', '=', receipt.store_id.id),
+                ])
+
                 batch = line.batch_id
                 if not batch and line.batch_number:
                     batch = Batch.create({
@@ -73,7 +83,34 @@ class OtmStockReceipt(models.Model):
                     'purchase_id': receipt.purchase_id.id if receipt.purchase_id else False,
                     'receipt_id': receipt.id,
                 })
+
+                if is_new_to_store:
+                    uom_name = line.uom_id.name or line.product_tmpl_id.uom_id.name or 'unit(s)'
+                    new_to_store_lines.append(
+                        f'{line.product_tmpl_id.name}: {line.quantity:g} {uom_name} '
+                        f'@ purchase rate {line.purchase_price:g}'
+                    )
+
             receipt.state = 'confirmed'
+
+            if new_to_store_lines:
+                receipt.message_post(body=(
+                    '<b>New to %s</b> — added to this store\'s stock for the first time:<br/>%s'
+                    % (receipt.store_id.name, '<br/>'.join(new_to_store_lines))
+                ))
+                all_new_lines.extend(f'{receipt.store_id.name} — {l}' for l in new_to_store_lines)
+
+        if all_new_lines:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Added to store',
+                    'message': '\n'.join(all_new_lines),
+                    'type': 'success',
+                    'sticky': True,
+                },
+            }
 
     def action_reset_draft(self):
         for receipt in self:
@@ -95,8 +132,11 @@ class OtmStockReceiptLine(models.Model):
     batch_number = fields.Char(string='New Batch Number')
     manufacturing_date = fields.Date(string='Manufacturing Date')
     expiry_date = fields.Date(string='Expiry Date')
-    purchase_price = fields.Float(string='Purchase Price')
-    selling_price = fields.Float(string='Selling Price')
+    purchase_price = fields.Float(string='Purchase Rate',
+                                   help='The rate paid to the vendor — this becomes the stock cost '
+                                        '(unit_cost) posted to the ledger.')
+    selling_price = fields.Float(string='Selling Rate',
+                                  help='Optional — has no effect on stock cost.')
     gst_percent = fields.Float(string='GST %')
 
     @api.onchange('product_tmpl_id')

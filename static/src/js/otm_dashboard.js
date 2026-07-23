@@ -18,6 +18,7 @@ class OtmStoreDashboard extends Component {
             navOpen: false,
             cards: {},
             lowStockItems: [],
+            stores: [],
             departmentConsumption: [],
             storeWiseStock: [],
             monthlyPurchaseValue: 0,
@@ -42,6 +43,7 @@ class OtmStoreDashboard extends Component {
         const data = await this.orm.call("otm.dashboard", "get_dashboard_data", [[]]);
         this.state.cards = data.cards;
         this.state.lowStockItems = data.low_stock_items;
+        this.state.stores = data.stores;
         this.state.departmentConsumption = data.department_consumption;
         this.state.storeWiseStock = data.store_wise_stock;
         this.state.monthlyPurchaseValue = data.monthly_purchase_value;
@@ -92,6 +94,25 @@ class OtmStoreDashboard extends Component {
             return "—";
         }
         return item.days_of_cover < 1 ? "<1" : Math.round(item.days_of_cover);
+    }
+
+    // --- store cards ---
+    storeAccent(store) {
+        if (store.out_count > 0) return "out";
+        if (store.critical_count > 0) return "critical";
+        if (store.low_count > 0) return "low";
+        return "ok";
+    }
+
+    openStoreDetail(store) {
+        this.action.doAction({
+            type: "ir.actions.act_window",
+            name: store.name + " — Live Stock",
+            res_model: "otm.stock.quant",
+            views: [[false, "list"], [false, "pivot"]],
+            domain: [["store_id", "=", store.id]],
+            target: "current",
+        });
     }
 
     onOpenStores() {

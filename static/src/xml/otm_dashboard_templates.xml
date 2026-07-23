@@ -118,6 +118,32 @@
                             </div>
                         </div>
 
+                        <div class="otm_section_head">
+                            <h3>Stores</h3>
+                            <span class="otm_section_sub">Click a store to see its full product-level stock</span>
+                        </div>
+                        <div class="otm_store_grid">
+                            <t t-foreach="state.stores" t-as="store" t-key="store.id">
+                                <button type="button" t-attf-class="otm_store_card otm_store_{{storeAccent(store)}}"
+                                        t-on-click="() => this.openStoreDetail(store)">
+                                    <div class="otm_store_card_top">
+                                        <span class="otm_store_icon"><i class="fa fa-building"/></span>
+                                        <span class="otm_store_pct"><t t-esc="store.healthy_pct"/>% healthy</span>
+                                    </div>
+                                    <span class="otm_store_label"><t t-esc="store.name"/></span>
+                                    <strong class="otm_store_count"><t t-esc="store.total_products"/></strong>
+                                    <span class="otm_store_caption">products listed<t t-if="store.manager"> · managed by <t t-esc="store.manager"/></t></span>
+                                    <div class="otm_store_stats_row">
+                                        <span class="otm_store_stat otm_store_stat_out"><b><t t-esc="store.out_count"/></b> Out</span>
+                                        <span class="otm_store_stat otm_store_stat_low"><b><t t-esc="store.critical_count + store.low_count"/></b> Low</span>
+                                        <span class="otm_store_stat otm_store_stat_ok"><b><t t-esc="store.ok_count"/></b> OK</span>
+                                    </div>
+                                    <span class="otm_store_bar"><span t-attf-style="width: {{store.healthy_pct}}%"/></span>
+                                </button>
+                            </t>
+                            <div class="otm_store_empty" t-if="!state.stores.length">No stores yet.</div>
+                        </div>
+
                         <div class="otm_kpi_row">
                             <div class="otm_kpi_card" t-on-click="onOpenStores">
                                 <div class="otm_kpi_value"><t t-esc="state.cards.total_stores"/></div>

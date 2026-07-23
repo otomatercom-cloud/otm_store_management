@@ -63,6 +63,46 @@ class OtmDashboard(models.AbstractModel):
             r['days_of_cover'] or 0,
         ))
 
+        # full per-store breakdown (every product, not just the low ones) —
+        # used for the store card grid: total listed / out / critical /
+        # low / ok, per store.
+        store_status_counts = {}
+        store_value = {}
+        for (store, product), qty in store_product_qty.items():
+            counts = store_status_counts.setdefault(
+                store, {'total': 0, 'out': 0, 'critical': 0, 'low': 0, 'ok': 0})
+            counts['total'] += 1
+            if qty <= 0:
+                counts['out'] += 1
+            elif product.otm_critical_qty and qty <= product.otm_critical_qty:
+                counts['critical'] += 1
+            elif product.otm_reorder_qty and qty <= product.otm_reorder_qty:
+                counts['low'] += 1
+            else:
+                counts['ok'] += 1
+        for q in quants:
+            store_value[q.store_id] = store_value.get(q.store_id, 0.0) + q.value
+
+        stores_summary = []
+        for store in Store.search([], order='name'):
+            counts = store_status_counts.get(
+                store, {'total': 0, 'out': 0, 'critical': 0, 'low': 0, 'ok': 0})
+            healthy_pct = round((counts['ok'] / counts['total']) * 100) if counts['total'] else 100
+            stores_summary.append({
+                'id': store.id,
+                'name': store.name,
+                'code': store.code,
+                'manager': store.manager_id.name or None,
+                'total_products': counts['total'],
+                'out_count': counts['out'],
+                'critical_count': counts['critical'],
+                'low_count': counts['low'],
+                'ok_count': counts['ok'],
+                'at_risk_count': counts['out'] + counts['critical'] + counts['low'],
+                'healthy_pct': healthy_pct,
+                'value': round(store_value.get(store, 0.0), 2),
+            })
+
         batches = Batch.search([])
         expired = batches.filtered(lambda b: b.expiry_state == 'expired')
         near_expiry = batches.filtered(lambda b: b.expiry_state == 'near_expiry')
@@ -110,6 +150,7 @@ class OtmDashboard(models.AbstractModel):
                 'pending_approvals': pending_approvals,
             },
             'low_stock_items': low_stock_rows,
+            'stores': stores_summary,
             'department_consumption': [
                 {'label': k, 'value': round(v, 2)} for k, v in
                 sorted(dept_consumption.items(), key=lambda x: -x[1])

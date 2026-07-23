@@ -74,28 +74,44 @@ class OtmStockMove(models.Model):
 
     def _check_sufficient_stock(self, vals):
         """Raise if posting this outgoing quantity would take the balance
-        for this product/store (and batch, if given) below zero. Checked
-        at store level, not location level, since issue/transfer/adjustment
-        lines treat stock within a store as fungible across locations."""
-        domain = [
+        below zero — checked at store level (and batch, if given), and
+        additionally at the specific location if one is set on this move.
+        Location-level fungibility is assumed only when no location is
+        specified; once a move names a location, it must not drain that
+        location past what it actually holds, even if other locations in
+        the same store have surplus."""
+        base_domain = [
             ('product_tmpl_id', '=', vals.get('product_tmpl_id')),
             ('store_id', '=', vals.get('store_id')),
         ]
         if vals.get('batch_id'):
-            domain.append(('batch_id', '=', vals['batch_id']))
-        current_balance = sum(self.search(domain).mapped('quantity'))
-        resulting_balance = current_balance + vals.get('quantity', 0.0)
-        if resulting_balance < -0.0001:
-            product = self.env['product.template'].browse(vals.get('product_tmpl_id'))
-            store = self.env['otm.store'].browse(vals.get('store_id'))
-            uom_name = product.uom_id.name or 'unit(s)'
+            base_domain.append(('batch_id', '=', vals['batch_id']))
+
+        product = self.env['product.template'].browse(vals.get('product_tmpl_id'))
+        store = self.env['otm.store'].browse(vals.get('store_id'))
+        uom_name = product.uom_id.name or 'unit(s)'
+
+        store_balance = sum(self.search(base_domain).mapped('quantity'))
+        if store_balance + vals.get('quantity', 0.0) < -0.0001:
             raise UserError(
-                f'Not enough stock: {product.name} at {store.name} has {current_balance:g} '
+                f'Not enough stock: {product.name} at {store.name} has {store_balance:g} '
                 f'{uom_name} on hand, which is not enough to cover this movement of '
                 f'{abs(vals.get("quantity", 0.0)):g} {uom_name}. Reduce the quantity, choose a '
                 f'different store or batch, or post a stock adjustment first if the recorded '
                 f'balance is wrong.'
             )
+
+        if vals.get('location_id'):
+            location_domain = base_domain + [('location_id', '=', vals['location_id'])]
+            location_balance = sum(self.search(location_domain).mapped('quantity'))
+            if location_balance + vals.get('quantity', 0.0) < -0.0001:
+                location = self.env['otm.store.location'].browse(vals['location_id'])
+                raise UserError(
+                    f'Not enough stock at that location: {product.name} at {store.name} / '
+                    f'{location.name} has only {location_balance:g} {uom_name} on hand, even '
+                    f'though the store overall has more. Pick the location that actually holds '
+                    f'this stock, or leave location blank to draw from the store as a whole.'
+                )
 
     def unlink(self):
         if not self.env.user.has_group('otm_store_management.group_otm_admin'):

@@ -111,6 +111,7 @@ class OtmStoreDashboard extends Component {
             res_model: "otm.stock.quant",
             views: [[false, "list"], [false, "pivot"]],
             domain: [["store_id", "=", store.id]],
+            context: { search_default_group_product: 1 },
             target: "current",
         });
     }

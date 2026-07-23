@@ -12,6 +12,10 @@
                 <field name="purchase_type"/>
                 <field name="purchase_date"/>
                 <field name="grand_total" widget="monetary"/>
+                <field name="bill_attachment_count" string="Bill" widget="badge"
+                       decoration-success="bill_attachment_count &gt; 0"
+                       decoration-warning="bill_attachment_count == 0"
+                       optional="show"/>
                 <field name="state" widget="badge"
                        decoration-success="state == 'received'"
                        decoration-info="state == 'confirmed'"
@@ -90,6 +94,10 @@
                                     <field name="grand_total" readonly="1"/>
                                 </group>
                             </group>
+                        </page>
+                        <page string="Purchase Bill">
+                            <field name="bill_attachment_ids" widget="many2many_binary"
+                                   string="Upload the vendor's invoice/bill (photo or scan) — multiple files allowed."/>
                         </page>
                     </notebook>
                 </sheet>

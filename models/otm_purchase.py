@@ -28,6 +28,12 @@ class OtmPurchase(models.Model):
     purchase_date = fields.Date(string='Purchase Date', default=fields.Date.context_today, required=True)
     bill_date = fields.Date(string='Bill Date')
 
+    bill_attachment_ids = fields.Many2many(
+        'ir.attachment', 'otm_purchase_bill_attachment_rel', 'purchase_id', 'attachment_id',
+        string='Purchase Bill(s)',
+        help='Photo or scan of the vendor invoice/bill for this purchase.')
+    bill_attachment_count = fields.Integer(compute='_compute_bill_attachment_count')
+
     line_ids = fields.One2many('otm.purchase.line', 'purchase_id', string='Purchase Lines')
 
     bill_amount = fields.Float(string='Bill Amount (Taxable)', compute='_compute_amounts', store=True)
@@ -76,6 +82,10 @@ class OtmPurchase(models.Model):
     def _compute_receipt_count(self):
         for purchase in self:
             purchase.receipt_count = len(purchase.receipt_ids)
+
+    def _compute_bill_attachment_count(self):
+        for purchase in self:
+            purchase.bill_attachment_count = len(purchase.bill_attachment_ids)
 
     def action_confirm(self):
         for purchase in self:

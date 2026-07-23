@@ -9,6 +9,7 @@
                   decoration-warning="otm_stock_status == 'low'">
                 <field name="default_code" optional="show"/>
                 <field name="name"/>
+                <field name="otm_default_store_id" optional="show"/>
                 <field name="otm_hsn_code" optional="show"/>
                 <field name="uom_id"/>
                 <field name="otm_current_qty"/>
@@ -36,6 +37,7 @@
                 <filter string="Stock Out" name="stock_out" domain="[('otm_is_stock_out', '=', True)]"/>
                 <filter string="Perishable" name="perishable" domain="[('otm_is_perishable', '=', True)]"/>
                 <group>
+                    <filter string="Default Store" name="group_default_store" context="{'group_by': 'otm_default_store_id'}"/>
                     <filter string="Storage Type" name="group_storage" context="{'group_by': 'otm_storage_type'}"/>
                     <filter string="Preferred Vendor" name="group_vendor" context="{'group_by': 'otm_preferred_vendor_id'}"/>
                 </group>

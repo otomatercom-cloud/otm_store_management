@@ -63,9 +63,10 @@
                     </group>
                     <notebook>
                         <page string="Lines">
-                            <field name="line_ids">
+                            <field name="line_ids" context="{'default_store_id': store_id}">
                                 <list editable="bottom">
                                     <field name="product_tmpl_id"/>
+                                    <field name="store_id"/>
                                     <field name="quantity"/>
                                     <field name="uom_id"/>
                                     <field name="unit_price"/>

@@ -18,6 +18,7 @@
                             <field name="otm_purchase_uom_id"/>
                             <field name="otm_issue_uom_id"/>
                             <field name="otm_preferred_vendor_id"/>
+                            <field name="otm_default_store_id"/>
                         </group>
                         <group string="Reorder Levels">
                             <field name="otm_min_qty"/>

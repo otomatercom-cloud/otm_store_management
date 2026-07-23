@@ -91,10 +91,12 @@
             <field name="purchase_date" eval="time.strftime('%Y-%m-%d')"/>
             <field name="line_ids" eval="[(0, 0, {
                 'product_tmpl_id': ref('demo_product_rice'),
+                'store_id': ref('demo_store_main'),
                 'quantity': 200,
                 'unit_price': 45.0,
             }), (0, 0, {
                 'product_tmpl_id': ref('demo_product_sugar'),
+                'store_id': ref('demo_store_main'),
                 'quantity': 150,
                 'unit_price': 40.0,
             })]"/>

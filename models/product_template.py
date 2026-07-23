@@ -16,6 +16,11 @@ class ProductTemplate(models.Model):
     otm_reorder_qty = fields.Float(string='Reorder Quantity')
     otm_critical_qty = fields.Float(string='Critical Quantity')
     otm_preferred_vendor_id = fields.Many2one('res.partner', string='Preferred Vendor')
+    otm_default_store_id = fields.Many2one(
+        'otm.store', string='Default Store',
+        help='The store this product is usually purchased into. Updated automatically whenever '
+             'a purchase line for this product is confirmed with a store — used to pre-fill the '
+             'store on future purchase lines for this product. You can also set it manually.')
     otm_shelf_life_days = fields.Integer(string='Shelf Life (Days)')
     otm_expiry_alert_days = fields.Integer(string='Expiry Alert (Days Before)', default=30)
     otm_is_perishable = fields.Boolean(string='Perishable')

@@ -11,7 +11,10 @@ class OtmPurchase(models.Model):
 
     name = fields.Char(string='Purchase No.', required=True, copy=False, default='New', tracking=True)
     vendor_id = fields.Many2one('res.partner', string='Vendor', tracking=True)
-    store_id = fields.Many2one('otm.store', string='Receiving Store', required=True, tracking=True)
+    store_id = fields.Many2one('otm.store', string='Default Store', required=True, tracking=True,
+                                help='Used as the default store for new purchase lines. Each line can '
+                                     'still be sent to a different store — useful when one vendor bill '
+                                     'covers products for several stores.')
 
     purchase_type = fields.Selection([
         ('gst', 'GST Purchase'),
@@ -92,24 +95,36 @@ class OtmPurchase(models.Model):
             if not purchase.line_ids:
                 raise UserError('Add at least one purchase line before confirming.')
             purchase.state = 'confirmed'
+            for line in purchase.line_ids:
+                if line.store_id and line.product_tmpl_id.otm_default_store_id != line.store_id:
+                    line.product_tmpl_id.otm_default_store_id = line.store_id.id
             purchase._create_stock_receipt()
 
     def _create_stock_receipt(self):
+        """One receipt per destination store — a single vendor bill can cover
+        products headed to several different stores, but a GRN/receipt is
+        always for one physical receiving location."""
         self.ensure_one()
-        receipt = self.env['otm.stock.receipt'].create({
-            'purchase_id': self.id,
-            'store_id': self.store_id.id,
-            'vendor_id': self.vendor_id.id,
-            'invoice_number': self.invoice_number,
-            'received_date': fields.Date.context_today(self),
-            'line_ids': [(0, 0, {
-                'product_tmpl_id': line.product_tmpl_id.id,
-                'quantity': line.quantity,
-                'purchase_price': line.unit_price,
-                'selling_price': line.selling_price,
-            }) for line in self.line_ids],
-        })
-        return receipt
+        receipts = self.env['otm.stock.receipt']
+        lines_by_store = {}
+        for line in self.line_ids:
+            lines_by_store[line.store_id] = lines_by_store.get(line.store_id, self.env['otm.purchase.line']) | line
+        for store, lines in lines_by_store.items():
+            receipt = self.env['otm.stock.receipt'].create({
+                'purchase_id': self.id,
+                'store_id': store.id,
+                'vendor_id': self.vendor_id.id,
+                'invoice_number': self.invoice_number,
+                'received_date': fields.Date.context_today(self),
+                'line_ids': [(0, 0, {
+                    'product_tmpl_id': line.product_tmpl_id.id,
+                    'quantity': line.quantity,
+                    'purchase_price': line.unit_price,
+                    'selling_price': line.selling_price,
+                }) for line in lines],
+            })
+            receipts |= receipt
+        return receipts
 
     def action_view_receipts(self):
         self.ensure_one()
@@ -131,6 +146,10 @@ class OtmPurchaseLine(models.Model):
 
     purchase_id = fields.Many2one('otm.purchase', string='Purchase', required=True, ondelete='cascade')
     product_tmpl_id = fields.Many2one('product.template', string='Product', required=True)
+    store_id = fields.Many2one('otm.store', string='Store', required=True,
+                                help='Destination store for this line. Pre-filled from the product\'s '
+                                     'usual store if it has one, otherwise from the purchase\'s default '
+                                     'store — change it per line to split one bill across stores.')
     quantity = fields.Float(string='Quantity', required=True, default=1.0)
     uom_id = fields.Many2one('uom.uom', string='UoM')
     unit_price = fields.Float(string='Purchase Rate', required=True,
@@ -150,6 +169,8 @@ class OtmPurchaseLine(models.Model):
         if self.product_tmpl_id:
             self.gst_percent = self.product_tmpl_id.otm_gst_percent
             self.uom_id = self.product_tmpl_id.otm_purchase_uom_id or self.product_tmpl_id.uom_id
+            if self.product_tmpl_id.otm_default_store_id:
+                self.store_id = self.product_tmpl_id.otm_default_store_id
 
     @api.depends('quantity', 'unit_price', 'gst_percent', 'purchase_id.is_interstate')
     def _compute_tax(self):
